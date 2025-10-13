@@ -1,0 +1,29 @@
+{% extends 'acervo/base.html' %}
+
+{% block content %}
+    <h1>Acervo de Livros</h1>
+    <a href="{% url 'adicionar_livro' %}" class="btn">Adicionar Novo Livro</a>
+    <br><br>
+    <table>
+        <thead>
+            <tr>
+                <th>Título</th>
+                <th>Autor</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for livro in livros %}
+            <tr>
+                <td>{{ livro.titulo }}</td>
+                <td>{{ livro.autor }}</td>
+                <td>{% if livro.disponivel %}Disponível{% else %}Emprestado{% endif %}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">Nenhum livro cadastrado.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

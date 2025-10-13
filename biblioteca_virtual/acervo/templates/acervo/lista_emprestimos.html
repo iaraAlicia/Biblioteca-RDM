@@ -1,0 +1,31 @@
+{% extends 'acervo/base.html' %}
+
+{% block content %}
+    <h1>Histórico de Empréstimos</h1>
+    <a href="{% url 'adicionar_emprestimo' %}" class="btn">Registrar Novo Empréstimo</a>
+    <br><br>
+    <table>
+        <thead>
+            <tr>
+                <th>Livro</th>
+                <th>Leitor</th>
+                <th>Data do Empréstimo</th>
+                <th>Devolução Prevista</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for emprestimo in emprestimos %}
+            <tr>
+                <td>{{ emprestimo.livro.titulo }}</td>
+                <td>{{ emprestimo.leitor }}</td>
+                <td>{{ emprestimo.data_emprestimo|date:"d/m/Y" }}</td>
+                <td>{{ emprestimo.data_devolucao_prevista|date:"d/m/Y" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">Nenhum empréstimo registrado.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
