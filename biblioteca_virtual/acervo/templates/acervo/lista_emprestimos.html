@@ -2,6 +2,15 @@
 
 {% block content %}
     <h1>Histórico de Empréstimos</h1>
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li style="color: green;">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
     <a href="{% url 'adicionar_emprestimo' %}" class="btn">Registrar Novo Empréstimo</a>
     <br><br>
     <table>
@@ -11,7 +20,7 @@
                 <th>Leitor</th>
                 <th>Data do Empréstimo</th>
                 <th>Devolução Prevista</th>
-            </tr>
+                <th>Status</th> </tr>
         </thead>
         <tbody>
             {% for emprestimo in emprestimos %}
@@ -20,10 +29,20 @@
                 <td>{{ emprestimo.leitor }}</td>
                 <td>{{ emprestimo.data_emprestimo|date:"d/m/Y" }}</td>
                 <td>{{ emprestimo.data_devolucao_prevista|date:"d/m/Y" }}</td>
+                <td>
+                    {% if emprestimo.data_devolucao_real %}
+                        Devolvido em {{ emprestimo.data_devolucao_real|date:"d/m/Y" }}
+                    {% else %}
+                        <form action="{% url 'devolver_livro' emprestimo.id %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit">Devolver</button>
+                        </form>
+                    {% endif %}
+                </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="4">Nenhum empréstimo registrado.</td>
+                <td colspan="5">Nenhum empréstimo registrado.</td>
             </tr>
             {% endfor %}
         </tbody>
