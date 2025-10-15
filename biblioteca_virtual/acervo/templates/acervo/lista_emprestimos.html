@@ -20,18 +20,27 @@
                 <th>Leitor</th>
                 <th>Data do Empréstimo</th>
                 <th>Devolução Prevista</th>
-                <th>Status</th> </tr>
+                <th>Status</th> <th>Ação</th>   </tr>
         </thead>
         <tbody>
             {% for emprestimo in emprestimos %}
-            <tr>
+            <tr class="{% if emprestimo.esta_atrasado %}tabela-atrasado{% endif %}">
                 <td>{{ emprestimo.livro.titulo }}</td>
                 <td>{{ emprestimo.leitor }}</td>
                 <td>{{ emprestimo.data_emprestimo|date:"d/m/Y" }}</td>
                 <td>{{ emprestimo.data_devolucao_prevista|date:"d/m/Y" }}</td>
                 <td>
                     {% if emprestimo.data_devolucao_real %}
-                        Devolvido em {{ emprestimo.data_devolucao_real|date:"d/m/Y" }}
+                        <span class="status status-devolvido">Devolvido</span>
+                    {% elif emprestimo.esta_atrasado %}
+                        <span class="status status-atrasado">Atrasado</span>
+                    {% else %}
+                        <span class="status status-emprestado">Emprestado</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if emprestimo.data_devolucao_real %}
+                        <button type="button" disabled>Devolvido</button>
                     {% else %}
                         <form action="{% url 'devolver_livro' emprestimo.id %}" method="post" style="display:inline;">
                             {% csrf_token %}
@@ -42,7 +51,7 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="5">Nenhum empréstimo registrado.</td>
+                <td colspan="6">Nenhum empréstimo registrado.</td>
             </tr>
             {% endfor %}
         </tbody>
