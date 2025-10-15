@@ -2,6 +2,19 @@
 
 {% block content %}
     <h1>Acervo de Livros</h1>
+
+    <div style="margin-bottom: 20px; padding: 15px; background-color: #f8f9fa; border: 1px solid #dee2e6;">
+        <form method="get" action="{% url 'lista_livros' %}">
+            <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Buscar por título ou autor...">
+            <button type="submit" class="btn">Buscar</button>
+        </form>
+        <div style="margin-top: 10px;">
+            <strong>Filtrar por status:</strong>
+            <a href="{% url 'lista_livros' %}">Todos</a> |
+            <a href="{% url 'lista_livros' %}?status=disponivel">Disponíveis</a> |
+            <a href="{% url 'lista_livros' %}?status=emprestado">Emprestados</a>
+        </div>
+    </div>
     <a href="{% url 'adicionar_livro' %}" class="btn">Adicionar Novo Livro</a>
     <br><br>
     <table>
@@ -27,7 +40,13 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="4">Nenhum livro cadastrado.</td>
+                <td colspan="4">
+                    {% if request.GET.q or request.GET.status %}
+                        Nenhum livro encontrado com os filtros aplicados.
+                    {% else %}
+                        Nenhum livro cadastrado.
+                    {% endif %}
+                </td>
             </tr>
             {% endfor %}
         </tbody>

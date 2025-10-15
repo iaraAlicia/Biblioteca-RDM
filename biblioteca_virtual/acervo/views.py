@@ -9,13 +9,38 @@ from django.views.generic import UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 
+from django.db.models import Q
 
-# View para listar todos os livros
+# --------------- View para listar todos os livros ------------
+
 def lista_livros(request):
-    livros = Livro.objects.all().order_by('titulo')
-    return render(request, 'acervo/lista_livros.html', {'livros': livros})
+    # Começa com todos os livros, ordenados por título
+    queryset = Livro.objects.all().order_by('titulo')
 
-# View para adicionar um novo livro
+    # --- Lógica da Busca ---
+    termo_busca = request.GET.get('q')
+    if termo_busca:
+        # Usamos Q objects para fazer uma busca "OU" (OR) em múltiplos campos
+        queryset = queryset.filter(
+            Q(titulo__icontains=termo_busca) | Q(autor__icontains=termo_busca)
+        )
+
+    # --- Lógica do Filtro de Status ---
+    filtro_status = request.GET.get('status')
+    if filtro_status == 'disponivel':
+        queryset = queryset.filter(disponivel=True)
+    elif filtro_status == 'emprestado':
+        queryset = queryset.filter(disponivel=False)
+
+    context = {
+        'livros': queryset
+    }
+    return render(request, 'acervo/lista_livros.html', context)
+
+
+
+
+# --------------- View para adicionar um novo livro --------------
 @login_required
 def adicionar_livro(request):
     if request.method == 'POST':
@@ -27,12 +52,13 @@ def adicionar_livro(request):
         form = LivroForm()
     return render(request, 'acervo/adicionar_livro.html', {'form': form})
 
-# View para listar todos os empréstimos
+# -------------------- View para listar todos os empréstimos -----------------
+
 def lista_emprestimos(request):
     emprestimos = Emprestimo.objects.all().order_by('-data_emprestimo')
     return render(request, 'acervo/lista_emprestimos.html', {'emprestimos': emprestimos})
 
-# View para adicionar um novo empréstimo
+# --------------------- View para adicionar um novo empréstimo ------------------
 @login_required
 def adicionar_emprestimo(request):
     if request.method == 'POST':
@@ -55,7 +81,7 @@ def adicionar_emprestimo(request):
     return render(request, 'acervo/adicionar_emprestimo.html', {'form': form})
 
 
-# NOVA VIEW PARA DEVOLUÇÃO:
+# --------------------- NOVA VIEW PARA DEVOLUÇÃO: -------------------------
 @login_required
 def devolver_livro(request, emprestimo_id):
     # Encontra o empréstimo específico, ou retorna um erro 404 se não existir
@@ -78,7 +104,7 @@ def devolver_livro(request, emprestimo_id):
     return redirect('lista_emprestimos')
 
 
-# DETALHES DO LIVRO, E HISTORICO DE MOVIMENTAÇÃO:
+# ------------------ DETALHES DO LIVRO, E HISTORICO DE MOVIMENTAÇÃO: ---------------
 
 def detalhes_livro(request, pk):
     # Busca o livro específico pelo seu ID (pk), ou retorna erro 404 se não encontrar
@@ -99,7 +125,7 @@ def detalhes_livro(request, pk):
 
 
 
-# NOVAS VIEWS BASEADAS EM CLASSE:
+# ----------------- NOVAS VIEWS BASEADAS EM CLASSE: -------------------
 
 class EditarLivro(LoginRequiredMixin, UpdateView):
     model = Livro
