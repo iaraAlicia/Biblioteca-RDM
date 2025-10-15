@@ -16,7 +16,7 @@
         <tbody>
             {% for livro in livros %}
             <tr>
-                <td>{{ livro.titulo }}</td>
+                <td><a href="{% url 'detalhes_livro' livro.pk %}">{{ livro.titulo }}</a></td>
                 <td>{{ livro.autor }}</td>
                 <td>{% if livro.disponivel %}Disponível{% else %}Emprestado{% endif %}</td>
                 <td>

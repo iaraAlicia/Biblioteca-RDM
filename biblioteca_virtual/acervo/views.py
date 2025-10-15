@@ -77,6 +77,28 @@ def devolver_livro(request, emprestimo_id):
     # Redireciona o usuário de volta para a lista de empréstimos
     return redirect('lista_emprestimos')
 
+
+# DETALHES DO LIVRO, E HISTORICO DE MOVIMENTAÇÃO:
+
+def detalhes_livro(request, pk):
+    # Busca o livro específico pelo seu ID (pk), ou retorna erro 404 se não encontrar
+    livro = get_object_or_404(Livro, pk=pk)
+    
+    # Busca todos os empréstimos associados a este livro
+    # O .order_by('-data_emprestimo') mostra os mais recentes primeiro
+    emprestimos = Emprestimo.objects.filter(livro=livro).order_by('-data_emprestimo')
+    
+    # Monta o "contexto" que será enviado para o template
+    context = {
+        'livro': livro,
+        'emprestimos': emprestimos
+    }
+    
+    # Renderiza o template, passando o contexto com os dados
+    return render(request, 'acervo/detalhes_livro.html', context)
+
+
+
 # NOVAS VIEWS BASEADAS EM CLASSE:
 
 class EditarLivro(LoginRequiredMixin, UpdateView):

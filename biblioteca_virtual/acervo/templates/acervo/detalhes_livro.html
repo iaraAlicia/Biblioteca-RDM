@@ -1,0 +1,55 @@
+{% extends 'acervo/base.html' %}
+
+{% block content %}
+    <h1>{{ livro.titulo }}</h1>
+    <p><strong>Autor:</strong> {{ livro.autor }}</p>
+    <p><strong>Editora:</strong> {{ livro.editora }}</p>
+    <p><strong>Ano de Publicação:</strong> {{ livro.ano_publicacao }}</p>
+    <p><strong>ISBN:</strong> {{ livro.isbn }}</p>
+    <p>
+        <strong>Status:</strong> 
+        {% if livro.disponivel %}
+            <span style="color: green;">Disponível</span>
+        {% else %}
+            <span style="color: orange;">Emprestado</span>
+        {% endif %}
+    </p>
+
+    <hr>
+
+    <h2>Histórico de Empréstimos</h2>
+    
+    {% if emprestimos %}
+    <table>
+        <thead>
+            <tr>
+                <th>Leitor</th>
+                <th>Data do Empréstimo</th>
+                <th>Devolução Prevista</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for emprestimo in emprestimos %}
+            <tr>
+                <td>{{ emprestimo.leitor }}</td>
+                <td>{{ emprestimo.data_emprestimo|date:"d/m/Y" }}</td>
+                <td>{{ emprestimo.data_devolucao_prevista|date:"d/m/Y" }}</td>
+                <td>
+                    {% if emprestimo.data_devolucao_real %}
+                        Devolvido em {{ emprestimo.data_devolucao_real|date:"d/m/Y" }}
+                    {% else %}
+                        Emprestado
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Este livro nunca foi emprestado.</p>
+    {% endif %}
+
+    <br>
+    <a href="{% url 'lista_livros' %}" class="btn">Voltar para a Lista</a>
+{% endblock %}
