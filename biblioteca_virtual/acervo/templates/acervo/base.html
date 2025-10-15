@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Biblioteca Virtual</title>
     <style>
+           <style>
         body { font-family: sans-serif; margin: 40px; }
         nav { margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
         nav a { margin-right: 15px; text-decoration: none; }
@@ -12,6 +13,31 @@
         th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
         th { background-color: #f2f2f2; }
         .btn { padding: 10px 15px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; }
+
+        /* INÍCIO DO CSS PARA AS MENSAGENS */
+        .messages {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 20px 0;
+            transition: opacity 0.5s ease-out;
+        }
+        .messages li {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .messages li.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .messages li.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        /* FIM DO CSS PARA AS MENSAGENS */
     </style>
 </head>
 <body>
@@ -19,9 +45,39 @@
         <a href="{% url 'lista_livros' %}">Lista de Livros</a>
         <a href="{% url 'lista_emprestimos' %}">Lista de Empréstimos</a>
     </nav>
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
     <main>
         {% block content %}
         {% endblock %}
     </main>
+
+    <script>
+        // Este script espera o documento HTML ser completamente carregado
+        document.addEventListener('DOMContentLoaded', function() {
+            // Seleciona o container que envolve todas as mensagens
+            const messagesContainer = document.querySelector('.messages');
+
+            // Se o container de mensagens existir na página...
+            if (messagesContainer) {
+                // A função setTimeout agenda uma outra função para ser executada após um tempo
+                setTimeout(function() {
+                    // Define a opacidade para 0, iniciando o efeito de fade-out
+                    messagesContainer.style.opacity = '0';
+                    
+                    // Espera o fim da transição (500ms) para então esconder o elemento
+                    setTimeout(function() {
+                        messagesContainer.style.display = 'none';
+                    }, 500); // Este tempo deve ser igual ao tempo da transição no CSS
+                    
+                }, 5000); // 5000 milissegundos = 5 segundos
+            }
+        });
+    </script>
 </body>
 </html>

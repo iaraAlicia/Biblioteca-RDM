@@ -2,6 +2,7 @@
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone 
 
 class Livro(models.Model):
     titulo = models.CharField(max_length=200)
@@ -24,3 +25,11 @@ class Emprestimo(models.Model):
 
     def __str__(self):
         return f"{self.livro.titulo} emprestado para {self.leitor}"
+    
+    @property
+    def esta_atrasado(self):
+        # A condição só se aplica se o livro ainda não foi devolvido
+        if self.data_devolucao_real is None:
+            # Retorna True se a data de hoje for maior que a data de devolução prevista
+            return timezone.now().date() > self.data_devolucao_prevista
+        return False

@@ -1,4 +1,5 @@
 # acervo/views.py
+from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Livro, Emprestimo
@@ -6,8 +7,10 @@ from .forms import LivroForm, EmprestimoForm
 from django.utils import timezone # Importe o timezone
 
 from django.views.generic import UpdateView, DeleteView
+from django.contrib.messages.views import SuccessMessageMixin 
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
+
 
 from django.db.models import Q
 
@@ -46,7 +49,8 @@ def adicionar_livro(request):
     if request.method == 'POST':
         form = LivroForm(request.POST)
         if form.is_valid():
-            form.save()
+            livro = form.save()
+            messages.success(request, f'O livro "{livro.titulo}" foi cadastrado com sucesso!')
             return redirect('lista_livros')
     else:
         form = LivroForm()
@@ -75,6 +79,7 @@ def adicionar_emprestimo(request):
             livro_emprestado.disponivel = False
             livro_emprestado.save()
 
+            messages.success(request, f'O empréstimo do livro "{livro_emprestado.titulo}" foi registrado com sucesso!')
             return redirect('lista_emprestimos')
     else:
         form = EmprestimoForm()
@@ -127,13 +132,23 @@ def detalhes_livro(request, pk):
 
 # ----------------- NOVAS VIEWS BASEADAS EM CLASSE: -------------------
 
-class EditarLivro(LoginRequiredMixin, UpdateView):
+class EditarLivro(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Livro
     form_class = LivroForm
     template_name = 'acervo/editar_livro.html'
     success_url = reverse_lazy('lista_livros') # Para onde redirecionar após o sucesso
+    success_message = "O livro '%(titulo)s' foi atualizado com sucesso!"
 
-class ExcluirLivro(LoginRequiredMixin, DeleteView):
+class ExcluirLivro(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
     model = Livro
     template_name = 'acervo/excluir_livro_confirm.html'
     success_url = reverse_lazy('lista_livros')
+    success_message = "O livro '%(titulo)s' foi excluído com sucesso!"
+    
+    def post(self, request, *args, **kwargs):
+        # Pega o título do livro antes de deletá-lo
+        titulo_livro = self.get_object().titulo
+        # Adiciona a mensagem na fila
+        messages.success(self.request, f"O livro '{titulo_livro}' foi excluído com sucesso!")
+        # Continua com o processo normal de exclusão
+        return self.delete(request, *args, **kwargs)
