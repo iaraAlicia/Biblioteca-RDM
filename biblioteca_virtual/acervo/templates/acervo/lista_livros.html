@@ -10,6 +10,7 @@
                 <th>Título</th>
                 <th>Autor</th>
                 <th>Status</th>
+                <th>Ações</th>
             </tr>
         </thead>
         <tbody>
@@ -18,10 +19,15 @@
                 <td>{{ livro.titulo }}</td>
                 <td>{{ livro.autor }}</td>
                 <td>{% if livro.disponivel %}Disponível{% else %}Emprestado{% endif %}</td>
+                <td>
+                    <a href="{% url 'editar_livro' livro.pk %}">Editar</a>
+                    &nbsp;|&nbsp;
+                    <a href="{% url 'excluir_livro' livro.pk %}" style="color: red;">Excluir</a>
+                </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="3">Nenhum livro cadastrado.</td>
+                <td colspan="4">Nenhum livro cadastrado.</td>
             </tr>
             {% endfor %}
         </tbody>

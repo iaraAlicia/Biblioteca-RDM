@@ -1,11 +1,14 @@
 # acervo/views.py
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Livro, Emprestimo
 from .forms import LivroForm, EmprestimoForm
 from django.utils import timezone # Importe o timezone
-# acervo/views.py
+
+from django.views.generic import UpdateView, DeleteView
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 
 # View para listar todos os livros
 def lista_livros(request):
@@ -73,3 +76,16 @@ def devolver_livro(request, emprestimo_id):
 
     # Redireciona o usuário de volta para a lista de empréstimos
     return redirect('lista_emprestimos')
+
+# NOVAS VIEWS BASEADAS EM CLASSE:
+
+class EditarLivro(LoginRequiredMixin, UpdateView):
+    model = Livro
+    form_class = LivroForm
+    template_name = 'acervo/editar_livro.html'
+    success_url = reverse_lazy('lista_livros') # Para onde redirecionar após o sucesso
+
+class ExcluirLivro(LoginRequiredMixin, DeleteView):
+    model = Livro
+    template_name = 'acervo/excluir_livro_confirm.html'
+    success_url = reverse_lazy('lista_livros')
