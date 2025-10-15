@@ -1,9 +1,14 @@
 # acervo/views.py
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Livro, Emprestimo
 from .forms import LivroForm, EmprestimoForm
+from django.utils import timezone # Importe o timezone
+
+from django.views.generic import UpdateView, DeleteView
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 
 # View para listar todos os livros
 def lista_livros(request):
@@ -48,3 +53,39 @@ def adicionar_emprestimo(request):
     else:
         form = EmprestimoForm()
     return render(request, 'acervo/adicionar_emprestimo.html', {'form': form})
+
+
+# NOVA VIEW PARA DEVOLUÇÃO:
+@login_required
+def devolver_livro(request, emprestimo_id):
+    # Encontra o empréstimo específico, ou retorna um erro 404 se não existir
+    emprestimo = get_object_or_404(Emprestimo, id=emprestimo_id)
+
+    # Define a data de devolução real como a data e hora atuais
+    emprestimo.data_devolucao_real = timezone.now().date()
+    emprestimo.save()
+
+    # Pega o livro associado ao empréstimo e o torna disponível novamente
+    livro = emprestimo.livro
+    livro.disponivel = True
+    livro.save()
+    
+    # Adiciona uma mensagem de sucesso para dar feedback ao usuário
+    from django.contrib import messages
+    messages.success(request, f'O livro "{livro.titulo}" foi devolvido com sucesso!')
+
+    # Redireciona o usuário de volta para a lista de empréstimos
+    return redirect('lista_emprestimos')
+
+# NOVAS VIEWS BASEADAS EM CLASSE:
+
+class EditarLivro(LoginRequiredMixin, UpdateView):
+    model = Livro
+    form_class = LivroForm
+    template_name = 'acervo/editar_livro.html'
+    success_url = reverse_lazy('lista_livros') # Para onde redirecionar após o sucesso
+
+class ExcluirLivro(LoginRequiredMixin, DeleteView):
+    model = Livro
+    template_name = 'acervo/excluir_livro_confirm.html'
+    success_url = reverse_lazy('lista_livros')

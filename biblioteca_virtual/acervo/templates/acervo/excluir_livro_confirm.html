@@ -1,0 +1,13 @@
+{% extends 'acervo/base.html' %}
+
+{% block content %}
+    <h1>Confirmar Exclusão</h1>
+    <p>Você tem certeza que deseja excluir o livro "{{ object.titulo }}"?</p>
+    <p><strong>Esta ação não pode ser desfeita.</strong></p>
+    
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn" style="background-color: #dc3545;">Sim, Excluir</button>
+        <a href="{% url 'lista_livros' %}" style="margin-left: 10px;">Cancelar</a>
+    </form>
+{% endblock %}

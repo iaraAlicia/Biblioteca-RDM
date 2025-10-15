@@ -7,6 +7,9 @@ urlpatterns = [
     # URLs para Livros
     path('livros/', views.lista_livros, name='lista_livros'),
     path('livros/novo/', views.adicionar_livro, name='adicionar_livro'),
+    # CRUD de Livros
+    path('livros/<int:pk>/editar/', views.EditarLivro.as_view(), name='editar_livro'),
+    path('livros/<int:pk>/excluir/', views.ExcluirLivro.as_view(), name='excluir_livro'),
 
     # URLs para Empréstimos
     path('emprestimos/', views.lista_emprestimos, name='lista_emprestimos'),
@@ -14,4 +17,6 @@ urlpatterns = [
     
      # URLs para devolução
     path('emprestimos/<int:emprestimo_id>/devolver/', views.devolver_livro, name='devolver_livro'),
+    
+
 ]
