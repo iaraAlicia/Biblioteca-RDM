@@ -11,6 +11,19 @@
         </ul>
     {% endif %}
 
+    <div style="margin-bottom: 20px; padding: 15px; background-color: #f8f9fa; border: 1px solid #dee2e6;">
+        <form method="get" action="{% url 'lista_emprestimos' %}">
+            <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Buscar por livro, leitor ou matrícula..." style="width: 300px;">
+            <button type="submit" class="btn">Buscar</button>
+        </form>
+        <div style="margin-top: 10px;">
+            <strong>Filtrar por status:</strong>
+            <a href="{% url 'lista_emprestimos' %}">Todos</a> |
+            <a href="{% url 'lista_emprestimos' %}?status=pendente">Pendentes</a> |
+            <a href="{% url 'lista_emprestimos' %}?status=devolvido">Devolvidos</a>
+        </div>
+    </div>
+
     <a href="{% url 'adicionar_emprestimo' %}" class="btn">Registrar Novo Empréstimo</a>
     <br><br>
     <table>
@@ -18,6 +31,7 @@
             <tr>
                 <th>Livro</th>
                 <th>Leitor</th>
+                <th>Matricula</th>
                 <th>Data do Empréstimo</th>
                 <th>Devolução Prevista</th>
                 <th>Status</th> <th>Ação</th>   </tr>
@@ -26,7 +40,8 @@
             {% for emprestimo in emprestimos %}
             <tr class="{% if emprestimo.esta_atrasado %}tabela-atrasado{% endif %}">
                 <td>{{ emprestimo.livro.titulo }}</td>
-                <td>{{ emprestimo.leitor }}</td>
+                <td>{{ emprestimo.leitor.nome }}</td>
+                <td>{{ emprestimo.leitor.matricula }}</td>
                 <td>{{ emprestimo.data_emprestimo|date:"d/m/Y" }}</td>
                 <td>{{ emprestimo.data_devolucao_prevista|date:"d/m/Y" }}</td>
                 <td>

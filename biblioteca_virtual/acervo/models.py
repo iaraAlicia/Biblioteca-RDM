@@ -4,6 +4,17 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone 
 
+# ADICIONE O NOVO MODELO AQUI
+class Leitor(models.Model):
+    nome = models.CharField(max_length=200)
+    matricula = models.CharField(max_length=20, unique=True, verbose_name="Matrícula")
+    turma = models.CharField(max_length=50, blank=True)
+    telefone = models.CharField(max_length=20, blank=True)
+    ativo = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.nome
+
 class Livro(models.Model):
     titulo = models.CharField(max_length=200)
     autor = models.CharField(max_length=200)
@@ -17,7 +28,7 @@ class Livro(models.Model):
 
 class Emprestimo(models.Model):
     livro = models.ForeignKey(Livro, on_delete=models.CASCADE)
-    leitor = models.CharField(max_length=100)
+    leitor = models.ForeignKey(Leitor, on_delete=models.PROTECT, related_name='emprestimos')
     data_emprestimo = models.DateField(auto_now_add=True)
     data_devolucao_prevista = models.DateField()
     data_devolucao_real = models.DateField(null=True, blank=True)

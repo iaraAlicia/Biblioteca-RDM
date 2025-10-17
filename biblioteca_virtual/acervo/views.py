@@ -2,16 +2,16 @@
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import Livro, Emprestimo
-from .forms import LivroForm, EmprestimoForm
+from .models import Livro, Emprestimo, Leitor
+from .forms import LivroForm, EmprestimoForm, LeitorForm
 from django.utils import timezone # Importe o timezone
 
-from django.views.generic import UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.contrib.messages.views import SuccessMessageMixin 
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-
+from django.http import HttpResponseRedirect
 from django.db.models import Q
 
 # --------------- View para listar todos os livros ------------
@@ -59,8 +59,33 @@ def adicionar_livro(request):
 # -------------------- View para listar todos os empréstimos -----------------
 
 def lista_emprestimos(request):
-    emprestimos = Emprestimo.objects.all().order_by('-data_emprestimo')
-    return render(request, 'acervo/lista_emprestimos.html', {'emprestimos': emprestimos})
+    # Otimização: Usamos select_related para buscar os dados do livro e do leitor
+    # em uma única consulta ao banco de dados, tornando a página muito mais rápida.
+    queryset = Emprestimo.objects.select_related('livro', 'leitor').order_by('-data_emprestimo')
+
+    # --- Lógica da Busca ---
+    termo_busca = request.GET.get('q')
+    if termo_busca:
+        # Busca no título do livro, no nome do leitor ou na matrícula do leitor
+        queryset = queryset.filter(
+            Q(livro__titulo__icontains=termo_busca) |
+            Q(leitor__nome__icontains=termo_busca) |
+            Q(leitor__matricula__icontains=termo_busca)
+        )
+
+    # --- Lógica do Filtro de Status ---
+    filtro_status = request.GET.get('status')
+    if filtro_status == 'pendente':
+        # Filtra por empréstimos que ainda não foram devolvidos
+        queryset = queryset.filter(data_devolucao_real__isnull=True)
+    elif filtro_status == 'devolvido':
+        # Filtra por empréstimos que já foram devolvidos
+        queryset = queryset.filter(data_devolucao_real__isnull=False)
+
+    context = {
+        'emprestimos': queryset
+    }
+    return render(request, 'acervo/lista_emprestimos.html', context)
 
 # --------------------- View para adicionar um novo empréstimo ------------------
 @login_required
@@ -152,3 +177,88 @@ class ExcluirLivro(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
         messages.success(self.request, f"O livro '{titulo_livro}' foi excluído com sucesso!")
         # Continua com o processo normal de exclusão
         return self.delete(request, *args, **kwargs)
+    
+    
+    
+# ------------------- CRUD PARA LEITORES -----------------
+
+class ListaLeitores(LoginRequiredMixin, ListView):
+    model = Leitor
+    template_name = 'acervo/lista_leitores.html'
+    context_object_name = 'leitores'
+
+    # SUBSTITUA ESTE MÉTODO PELO CÓDIGO ABAIXO
+    def get_queryset(self):
+        # Começa com todos os leitores
+        queryset = Leitor.objects.all().order_by('nome')
+
+        # --- Lógica da Busca (continua igual) ---
+        termo_busca = self.request.GET.get('q')
+        if termo_busca:
+            queryset = queryset.filter(
+                Q(nome__icontains=termo_busca) |
+                Q(matricula__icontains=termo_busca) |
+                Q(turma__icontains=termo_busca)
+            )
+
+        # --- Lógica do Filtro de Status CORRIGIDA ---
+        filtro_status = self.request.GET.get('status')
+        if filtro_status == 'inativo':
+            # Se o filtro for 'inativo', mostra apenas os inativos
+            queryset = queryset.filter(ativo=False)
+        else:
+            # PARA QUALQUER OUTRO CASO (filtro 'ativo' ou nenhum filtro),
+            # mostra apenas os leitores ATIVOS. Este é o novo padrão.
+            queryset = queryset.filter(ativo=True)
+            
+        return queryset
+
+class AdicionarLeitor(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+    model = Leitor
+    form_class = LeitorForm
+    template_name = 'acervo/adicionar_leitor.html'
+    success_url = reverse_lazy('lista_leitores')
+    success_message = "Leitor '%(nome)s' cadastrado com sucesso!"
+
+class EditarLeitor(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+    model = Leitor
+    form_class = LeitorForm
+    template_name = 'acervo/editar_leitor.html'
+    success_url = reverse_lazy('lista_leitores')
+    success_message = "Leitor '%(nome)s' atualizado com sucesso!"
+    
+    
+
+class InativarLeitor(LoginRequiredMixin, DeleteView):
+    model = Leitor
+    template_name = 'acervo/inativar_leitor_confirm.html'
+    success_url = reverse_lazy('lista_leitores')
+
+    # Este método continua correto e é usado para exibir a página (GET)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['emprestimos_pendentes'] = Emprestimo.objects.filter(
+            leitor=self.get_object(), 
+            data_devolucao_real__isnull=True
+        )
+        return context
+
+    # A correção está neste método, que lida com a ação de inativar (POST)
+    def post(self, request, *args, **kwargs):
+        leitor = self.get_object()
+        
+        # CORREÇÃO: Fazemos a consulta diretamente aqui, em vez de chamar get_context_data
+        emprestimos_pendentes = Emprestimo.objects.filter(
+            leitor=leitor, 
+            data_devolucao_real__isnull=True
+        )
+
+        if emprestimos_pendentes.exists():
+            messages.error(request, f"Não é possível inativar o leitor '{leitor.nome}', pois ele possui empréstimos pendentes.")
+            return HttpResponseRedirect(self.success_url)
+
+        # Se não houver pendências, inativa o leitor
+        leitor.ativo = False
+        leitor.save()
+        messages.success(request, f"O leitor '{leitor.nome}' foi inativado com sucesso!")
+        return HttpResponseRedirect(self.success_url)

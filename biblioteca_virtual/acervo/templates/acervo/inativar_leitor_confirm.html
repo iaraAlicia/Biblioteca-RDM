@@ -1,0 +1,25 @@
+{% extends 'acervo/base.html' %}
+
+{% block content %}
+    <h1>Confirmar Inativação</h1>
+    <p>Você tem certeza que deseja inativar o leitor "{{ object.nome }}"?</p>
+    <p>Ele não aparecerá mais nas listas e não poderá realizar novos empréstimos, mas seu histórico será mantido.</p>
+    
+    {% if emprestimos_pendentes.count > 0 %}
+        <p style="color: red; font-weight: bold;">
+            Atenção: Este leitor não pode ser inativado pois possui {{ emprestimos_pendentes.count }} empréstimo(s) pendente(s).
+        </p>
+    {% endif %}
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        {% if emprestimos_pendentes.count > 0 %}
+            <button type="submit" class="btn" style="background-color: #6c757d;" disabled>Inativar</button>
+        {% else %}
+            <button type="submit" class="btn" style="background-color: #ffc107; color: black;">Sim, Inativar</button>
+        {% endif %}
+        
+        <a href="{% url 'lista_leitores' %}" style="margin-left: 10px;">Cancelar</a>
+    </form>
+{% endblock %}

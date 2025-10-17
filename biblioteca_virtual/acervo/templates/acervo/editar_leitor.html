@@ -1,0 +1,12 @@
+{% extends 'acervo/base.html' %}
+
+{% block content %}
+    <h1>Editar Leitor: {{ leitor.nome }}</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn">Salvar Alterações</button>
+        <a href="{% url 'lista_leitores' %}" style="margin-left: 10px;">Cancelar</a>
+    </form>
+{% endblock %}

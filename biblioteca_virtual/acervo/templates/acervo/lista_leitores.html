@@ -1,0 +1,48 @@
+{% extends 'acervo/base.html' %}
+
+{% block content %}
+    <h1>Leitores Cadastrados</h1>
+
+    <div style="margin-bottom: 20px; padding: 15px; background-color: #f8f9fa; border: 1px solid #dee2e6;">
+        <form method="get" action="{% url 'lista_leitores' %}">
+            <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Buscar por nome, matrícula ou turma..." style="width: 300px;">
+            <button type="submit" class="btn">Buscar</button>
+        </form>
+
+        <div style="margin-top: 10px;">
+            <strong>Filtrar por status:</strong>
+            <a href="{% url 'lista_leitores' %}">Ativos</a> |
+            <a href="{% url 'lista_leitores' %}?status=inativo">Inativos</a>
+        </div>
+    </div>
+    <a href="{% url 'adicionar_leitor' %}" class="btn">Adicionar Novo Leitor</a>
+    <br><br>
+    <table>
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Matrícula</th>
+                <th>Turma</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for leitor in leitores %}
+            <tr>
+                <td>{{ leitor.nome }}</td>
+                <td>{{ leitor.matricula }}</td>
+                <td>{{ leitor.turma }}</td>
+                <td>
+                    <a href="{% url 'editar_leitor' leitor.pk %}">Editar</a>
+                    &nbsp;|&nbsp;
+                     <a href="{% url 'inativar_leitor' leitor.pk %}" style="color: orange;">Inativar</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">Nenhum leitor cadastrado.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

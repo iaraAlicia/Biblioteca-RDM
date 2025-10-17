@@ -2,8 +2,10 @@
 
 from django.urls import path
 from . import views
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
+    
     # URLs para Livros
     path('livros/', views.lista_livros, name='lista_livros'),
     path('livros/novo/', views.adicionar_livro, name='adicionar_livro'),
@@ -11,6 +13,12 @@ urlpatterns = [
     # CRUD de Livros
     path('livros/<int:pk>/editar/', views.EditarLivro.as_view(), name='editar_livro'),
     path('livros/<int:pk>/excluir/', views.ExcluirLivro.as_view(), name='excluir_livro'),
+    
+    # URLs para Leitores
+    path('leitores/', views.ListaLeitores.as_view(), name='lista_leitores'),
+    path('leitores/novo/', views.AdicionarLeitor.as_view(), name='adicionar_leitor'),
+    path('leitores/<int:pk>/editar/', views.EditarLeitor.as_view(), name='editar_leitor'),
+    path('leitores/<int:pk>/inativar/', views.InativarLeitor.as_view(), name='inativar_leitor'),
 
     # URLs para Empréstimos
     path('emprestimos/', views.lista_emprestimos, name='lista_emprestimos'),
