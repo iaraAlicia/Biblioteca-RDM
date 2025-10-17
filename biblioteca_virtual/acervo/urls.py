@@ -1,10 +1,15 @@
 # acervo/urls.py
 
-from django.urls import path
+from django.urls import path, reverse_lazy
 from . import views
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
+    # URLs de Autenticação
+    path('login/', auth_views.LoginView.as_view(template_name='acervo/login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(next_page=reverse_lazy('home')), name='logout'),
+    # Nossa view personalizada para registrar um novo bibliotecário
+    path('registrar/', views.RegistrarBibliotecario.as_view(), name='registrar'),
     
     # URLs para Livros
     path('livros/', views.lista_livros, name='lista_livros'),

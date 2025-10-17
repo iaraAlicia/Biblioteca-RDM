@@ -2,6 +2,7 @@
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
 from .models import Livro, Emprestimo, Leitor
 from .forms import LivroForm, EmprestimoForm, LeitorForm
 from django.utils import timezone # Importe o timezone
@@ -14,8 +15,27 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.db.models import Q
 
+# --------------- Registrar novo bibliotecario ------------
+
+def home(request):
+    return render(request, 'acervo/home.html')
+
+class RegistrarBibliotecario(CreateView):
+    # Usa o formulário de criação de usuário do Django
+    form_class = UserCreationForm
+    # Redireciona para a página de login após o registro bem-sucedido
+    success_url = reverse_lazy('login')
+    # Template que será usado para renderizar a página
+    template_name = 'acervo/registrar.html'
+
+    def form_valid(self, form):
+        # Adiciona uma mensagem de sucesso antes de redirecionar
+        messages.success(self.request, "Bibliotecário registrado com sucesso! Faça o login para continuar.")
+        return super().form_valid(form)
+
 # --------------- View para listar todos os livros ------------
 
+@login_required
 def lista_livros(request):
     # Começa com todos os livros, ordenados por título
     queryset = Livro.objects.all().order_by('titulo')
@@ -58,6 +78,7 @@ def adicionar_livro(request):
 
 # -------------------- View para listar todos os empréstimos -----------------
 
+@login_required
 def lista_emprestimos(request):
     # Otimização: Usamos select_related para buscar os dados do livro e do leitor
     # em uma única consulta ao banco de dados, tornando a página muito mais rápida.
@@ -136,6 +157,7 @@ def devolver_livro(request, emprestimo_id):
 
 # ------------------ DETALHES DO LIVRO, E HISTORICO DE MOVIMENTAÇÃO: ---------------
 
+@login_required
 def detalhes_livro(request, pk):
     # Busca o livro específico pelo seu ID (pk), ou retorna erro 404 se não encontrar
     livro = get_object_or_404(Livro, pk=pk)
@@ -262,3 +284,4 @@ class InativarLeitor(LoginRequiredMixin, DeleteView):
         leitor.save()
         messages.success(request, f"O leitor '{leitor.nome}' foi inativado com sucesso!")
         return HttpResponseRedirect(self.success_url)
+    

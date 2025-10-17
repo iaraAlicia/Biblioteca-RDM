@@ -1,0 +1,12 @@
+{% extends 'acervo/base.html' %}
+
+{% block content %}
+    <h1>Registrar Novo Bibliotecário</h1>
+    <p>Crie uma nova conta para gerenciar a biblioteca.</p>
+    
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn">Registrar</button>
+    </form>
+{% endblock %}
