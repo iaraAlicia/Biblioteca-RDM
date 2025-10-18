@@ -12,6 +12,8 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 
+from django.core.paginator import Paginator
+
 from django.http import HttpResponseRedirect
 from django.db.models import Q
 
@@ -37,26 +39,33 @@ class RegistrarBibliotecario(CreateView):
 
 @login_required
 def lista_livros(request):
-    # Começa com todos os livros, ordenados por título
+    # A lógica de busca e filtro continua exatamente a mesma
     queryset = Livro.objects.all().order_by('titulo')
-
-    # --- Lógica da Busca ---
     termo_busca = request.GET.get('q')
     if termo_busca:
-        # Usamos Q objects para fazer uma busca "OU" (OR) em múltiplos campos
         queryset = queryset.filter(
             Q(titulo__icontains=termo_busca) | Q(autor__icontains=termo_busca)
         )
-
-    # --- Lógica do Filtro de Status ---
     filtro_status = request.GET.get('status')
     if filtro_status == 'disponivel':
         queryset = queryset.filter(disponivel=True)
     elif filtro_status == 'emprestado':
         queryset = queryset.filter(disponivel=False)
 
+    # --- INÍCIO DA LÓGICA DE PAGINAÇÃO ---
+    # 1. Cria o objeto Paginator, definindo 10 livros por página
+    paginator = Paginator(queryset, 10) 
+
+    # 2. Pega o número da página da URL (ex: /?page=2)
+    page_number = request.GET.get('page')
+
+    # 3. Pega o objeto da página correta
+    page_obj = paginator.get_page(page_number)
+    # --- FIM DA LÓGICA DE PAGINAÇÃO ---
+
     context = {
-        'livros': queryset
+        # 4. Envia o objeto da página para o template em vez da lista inteira
+        'page_obj': page_obj 
     }
     return render(request, 'acervo/lista_livros.html', context)
 
@@ -80,31 +89,35 @@ def adicionar_livro(request):
 
 @login_required
 def lista_emprestimos(request):
-    # Otimização: Usamos select_related para buscar os dados do livro e do leitor
-    # em uma única consulta ao banco de dados, tornando a página muito mais rápida.
+    # A lógica de busca e filtro continua exatamente a mesma
     queryset = Emprestimo.objects.select_related('livro', 'leitor').order_by('-data_emprestimo')
-
-    # --- Lógica da Busca ---
     termo_busca = request.GET.get('q')
     if termo_busca:
-        # Busca no título do livro, no nome do leitor ou na matrícula do leitor
         queryset = queryset.filter(
             Q(livro__titulo__icontains=termo_busca) |
             Q(leitor__nome__icontains=termo_busca) |
             Q(leitor__matricula__icontains=termo_busca)
         )
-
-    # --- Lógica do Filtro de Status ---
     filtro_status = request.GET.get('status')
     if filtro_status == 'pendente':
-        # Filtra por empréstimos que ainda não foram devolvidos
         queryset = queryset.filter(data_devolucao_real__isnull=True)
     elif filtro_status == 'devolvido':
-        # Filtra por empréstimos que já foram devolvidos
         queryset = queryset.filter(data_devolucao_real__isnull=False)
 
+    # --- INÍCIO DA LÓGICA DE PAGINAÇÃO ---
+    # 1. Cria o objeto Paginator, definindo 10 empréstimos por página
+    paginator = Paginator(queryset, 10)
+
+    # 2. Pega o número da página da URL
+    page_number = request.GET.get('page')
+
+    # 3. Pega o objeto da página correta
+    page_obj = paginator.get_page(page_number)
+    # --- FIM DA LÓGICA DE PAGINAÇÃO ---
+
     context = {
-        'emprestimos': queryset
+        # 4. Envia o objeto da página para o template
+        'page_obj': page_obj
     }
     return render(request, 'acervo/lista_emprestimos.html', context)
 
@@ -208,6 +221,7 @@ class ListaLeitores(LoginRequiredMixin, ListView):
     model = Leitor
     template_name = 'acervo/lista_leitores.html'
     context_object_name = 'leitores'
+    paginate_by = 10 
 
     # SUBSTITUA ESTE MÉTODO PELO CÓDIGO ABAIXO
     def get_queryset(self):
