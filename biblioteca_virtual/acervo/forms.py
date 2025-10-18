@@ -15,19 +15,13 @@ class EmprestimoForm(forms.ModelForm):
         model = Emprestimo
         fields = ['livro', 'leitor', 'data_devolucao_prevista']
         widgets = {
-            'data_devolucao_prevista': forms.DateInput(attrs={'type': 'date'})
+            'data_devolucao_prevista': forms.DateInput(attrs={'type': 'date'}),
+            
+            # Garantimos que os dois campos são do tipo Select
+            # e ambos têm a classe 'select2' para o JavaScript encontrar.
+            'livro': forms.Select(attrs={'class': 'select2'}),
+            'leitor': forms.Select(attrs={'class': 'select2'}),
         }
-
-    def __init__(self, *args, **kwargs):
-        # Chama o construtor original
-        super().__init__(*args, **kwargs)
-        
-        # Filtra o campo 'livro' para mostrar apenas os que estão disponíveis (já existia)
-        self.fields['livro'].queryset = Livro.objects.filter(disponivel=True).order_by('titulo')
-        
-        # ADICIONE ESTA LINHA PARA FILTRAR OS LEITORES
-        # Filtra o campo 'leitor' para mostrar apenas os que estão ativos
-        self.fields['leitor'].queryset = Leitor.objects.filter(ativo=True).order_by('nome')
         
         
 class LeitorForm(forms.ModelForm):

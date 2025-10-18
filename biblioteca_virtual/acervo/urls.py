@@ -29,8 +29,12 @@ urlpatterns = [
     path('emprestimos/', views.lista_emprestimos, name='lista_emprestimos'),
     path('emprestimos/novo/', views.adicionar_emprestimo, name='adicionar_emprestimo'),
     
-     # URLs para devolução
+    # URLs para devolução
     path('emprestimos/<int:emprestimo_id>/devolver/', views.devolver_livro, name='devolver_livro'),
+    
+    # URLs de API para a busca com Select2
+    path('api/search-livros/', views.search_livros, name='search_livros'),
+    path('api/search-leitores/', views.search_leitores, name='search_leitores'),
     
 
 ]

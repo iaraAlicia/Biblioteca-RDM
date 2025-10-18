@@ -14,6 +14,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from django.core.paginator import Paginator
 
+from django.http import JsonResponse
 from django.http import HttpResponseRedirect
 from django.db.models import Q
 
@@ -299,3 +300,37 @@ class InativarLeitor(LoginRequiredMixin, DeleteView):
         messages.success(request, f"O leitor '{leitor.nome}' foi inativado com sucesso!")
         return HttpResponseRedirect(self.success_url)
     
+
+# --------------- API PARA BUSCAR LIVROS DISPONÍVEIS -----------------
+
+@login_required
+def search_livros(request):
+    term = request.GET.get('term', '')
+
+    # A correção está na lógica do .filter()
+    livros = Livro.objects.filter(disponivel=True).filter(
+        Q(titulo__icontains=term) | Q(isbn__icontains=term)
+    ).order_by('titulo')[:10]
+
+    results = [
+        {'id': livro.id, 'text': f'{livro.titulo} (ISBN: {livro.isbn})'} 
+        for livro in livros
+    ]
+    return JsonResponse(results, safe=False)
+
+# API PARA BUSCAR LEITORES ATIVOS
+@login_required
+def search_leitores(request):
+    term = request.GET.get('term', '')
+    # Busca por leitores ativos cujo nome ou matrícula contenha o termo
+    leitores = Leitor.objects.filter(
+        ativo=True
+    ).filter(
+        Q(nome__icontains=term) | Q(matricula__icontains=term)
+    ).order_by('nome')[:10] # Limita a 10 resultados
+
+    results = [
+        {'id': leitor.id, 'text': f'{leitor.nome} (Matrícula: {leitor.matricula})'} 
+        for leitor in leitores
+    ]
+    return JsonResponse(results, safe=False)
