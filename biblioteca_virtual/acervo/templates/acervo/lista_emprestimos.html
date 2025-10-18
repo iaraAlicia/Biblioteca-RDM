@@ -14,7 +14,7 @@
     <div style="margin-bottom: 20px; padding: 15px; background-color: #f8f9fa; border: 1px solid #dee2e6;">
         <form method="get" action="{% url 'lista_emprestimos' %}">
             <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Buscar por livro, leitor ou matrícula..." style="width: 300px;">
-            <button type="submit" class="btn">Buscar</button>
+            <button type="submit" class="btn btn-success">Buscar</button>
         </form>
         <div style="margin-top: 10px;">
             <strong>Filtrar por status:</strong>
@@ -24,9 +24,9 @@
         </div>
     </div>
 
-    <a href="{% url 'adicionar_emprestimo' %}" class="btn">Registrar Novo Empréstimo</a>
+    <a href="{% url 'adicionar_emprestimo' %}" class="btn btn-primary mb-3">Registrar Novo Empréstimo</a>
     <br><br>
-    <table>
+    <table class="table table-striped table-hover bg-white">
         <thead>
             <tr>
                 <th>Livro</th>
@@ -55,11 +55,11 @@
                 </td>
                 <td>
                     {% if emprestimo.data_devolucao_real %}
-                        <button type="button" disabled>Devolvido</button>
+                        <button class="btn btn-light" type="button" disabled>Devolvido</button>
                     {% else %}
                         <form action="{% url 'devolver_livro' emprestimo.id %}" method="post" style="display:inline;">
                             {% csrf_token %}
-                            <button type="submit">Devolver</button>
+                            <button class="btn btn-secondary" type="submit">Devolver</button>
                         </form>
                     {% endif %}
                 </td>

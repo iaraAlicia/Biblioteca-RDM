@@ -6,7 +6,7 @@
     <div style="margin-bottom: 20px; padding: 15px; background-color: #f8f9fa; border: 1px solid #dee2e6;">
         <form method="get" action="{% url 'lista_leitores' %}">
             <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Buscar por nome, matrícula ou turma..." style="width: 300px;">
-            <button type="submit" class="btn">Buscar</button>
+            <button type="submit" class="btn btn-success">Buscar</button>
         </form>
 
         <div style="margin-top: 10px;">
@@ -15,9 +15,9 @@
             <a href="{% url 'lista_leitores' %}?status=inativo">Inativos</a>
         </div>
     </div>
-    <a href="{% url 'adicionar_leitor' %}" class="btn">Adicionar Novo Leitor</a>
+    <a href="{% url 'adicionar_leitor' %}" class="btn btn-primary mb-3">Adicionar Novo Leitor</a>
     <br><br>
-    <table>
+    <table class="table table-striped table-hover bg-white">
         <thead>
             <tr>
                 <th>Nome</th>
@@ -33,9 +33,9 @@
                 <td>{{ leitor.matricula }}</td>
                 <td>{{ leitor.turma }}</td>
                 <td>
-                    <a href="{% url 'editar_leitor' leitor.pk %}">Editar</a>
+                    <a href="{% url 'editar_leitor' leitor.pk %}" class="btn btn-warning btn-sm">Editar</a>
                     &nbsp;|&nbsp;
-                     <a href="{% url 'inativar_leitor' leitor.pk %}" style="color: orange;">Inativar</a>
+                     <a href="{% url 'inativar_leitor' leitor.pk %}" class="btn btn-danger btn-sm">Inativar</a>
                 </td>
             </tr>
             {% empty %}

@@ -6,7 +6,7 @@
     <div style="margin-bottom: 20px; padding: 15px; background-color: #f8f9fa; border: 1px solid #dee2e6;">
         <form method="get" action="{% url 'lista_livros' %}">
             <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Buscar por título ou autor...">
-            <button type="submit" class="btn">Buscar</button>
+            <button type="submit" class="btn btn-success">Buscar</button>
         </form>
         <div style="margin-top: 10px;">
             <strong>Filtrar por status:</strong>
@@ -15,9 +15,9 @@
             <a href="{% url 'lista_livros' %}?status=emprestado">Emprestados</a>
         </div>
     </div>
-    <a href="{% url 'adicionar_livro' %}" class="btn">Adicionar Novo Livro</a>
+    <a href="{% url 'adicionar_livro' %}" class="btn btn-primary mb-3">Adicionar Novo Livro</a>
     <br><br>
-    <table>
+    <table class="table table-striped table-hover bg-white">
         <thead>
             <tr>
                 <th>Título</th>
@@ -33,9 +33,9 @@
                 <td>{{ livro.autor }}</td>
                 <td>{% if livro.disponivel %}Disponível{% else %}Emprestado{% endif %}</td>
                 <td>
-                    <a href="{% url 'editar_livro' livro.pk %}">Editar</a>
+                    <a href="{% url 'editar_livro' livro.pk %}" class="btn btn-warning btn-sm">Editar</a>
                     &nbsp;|&nbsp;
-                    <a href="{% url 'excluir_livro' livro.pk %}" style="color: red;">Excluir</a>
+                    <a href="{% url 'excluir_livro' livro.pk %}" class="btn btn-danger btn-sm">Excluir</a>
                 </td>
             </tr>
             {% empty %}
