@@ -1,0 +1,61 @@
+{% extends 'acervo/base_publica.html' %}
+{% load static %}
+
+{% block body_class %}light-theme{% endblock %}
+
+{% block page_specific_css %}
+    /* 1. NOVA IMAGEM DE FUNDO */
+    background-image: url("{% static 'images/bg-contato2.png' %}");
+
+    /* 2. REMOVENDO O OVERLAY AZUL ESCURO */
+    --hero-overlay-color: transparent;
+{% endblock %}
+
+
+{% block content %}
+<style>
+    /* 3. ESTILOS ESPECÍFICOS PARA O TEXTO AZUL NESTA PÁGINA */
+    .contato-content h1,
+    .contato-content h1 i,
+    .contato-content h5,
+    .contato-content p {
+        color: #2c5b96 !important; /* Azul escuro do seu design */
+    }
+</style>
+
+<div class="hero-section">
+    <div class="hero-overlay" style="background-color: var(--hero-overlay-color, rgba(44, 91, 150, 0.8));"></div>
+    <div class="hero-container">
+        <div class="hero-content contato-content">
+            <h1 class="display-4"><i class="bi bi-person-rolodex"></i> Entre em contato</h1>
+            <p class="lead">
+                Estamos disponíveis para dúvidas, sugestões ou uma boa conversa sobre livros.
+            </p>
+
+            <ul class="list-unstyled mt-4">
+                <li class="d-flex align-items-start mb-3">
+                    <span class="fs-4 me-3"><i class="bi bi-geo-alt-fill"></i></span>
+                    <div>
+                        <h5 class="fw-bold">Endereço</h5>
+                        <p class="mb-0">Conceição das Crioulas, Salgueiro - PE, 56120-000</p>
+                    </div>
+                </li>
+                <li class="d-flex align-items-start mb-3">
+                    <span class="fs-4 me-3"><i class="bi bi-telephone-fill"></i></span>
+                    <div>
+                        <h5 class="fw-bold">Telefone</h5>
+                        <p class="mb-0">(XX) XXXX-XXXX</p>
+                    </div>
+                </li>
+                <li class="d-flex align-items-start">
+                    <span class="fs-4 me-3"><i class="bi bi-envelope-fill"></i></span>
+                    <div>
+                        <h5 class="fw-bold">Email</h5>
+                        <p class="mb-0">contato@escolarosadoralina.com.br</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,10 +1,19 @@
-{% extends 'acervo/base.html' %}
+{% extends 'acervo/base_publica.html' %}
 
 {% block content %}
-    <div style="text-align: center; padding: 50px;">
-        <h1>Bem-vindo ao Sistema da Biblioteca Virtual</h1>
-        <p>Gerencie livros, leitores e empréstimos de forma fácil e eficiente.</p>
-        <br>
-        <a href="{% url 'login' %}" class="btn btn-primary btn-block">Acessar o Sistema</a>
+<div class="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="page-container">
+        <div class="hero-content">
+            <h1 class="display-5" style="color:#203e63; font-weight:600;"><i class="bi bi-book-open"></i>Bem-vindo(a)<br>à Biblioteca Virtual da<small style="color:white; font-weight:300;">  <br> Escola Rosa Doralina<br> </small> Mendes</h1>
+            <p class="lead">
+                Um espaço digital para gerenciar o acervo de nossa escola, incentivar a leitura e a preservar a história de Conceição das Crioulas.
+            </p>
+            <div>
+                <a href="{% url 'lista_livros' %}" class="btn btn-custom-primary">Acessar Acervo</a>
+                <a href="#" class="btn btn-custom-secondary">Reservar Livro</a>
+            </div>
+        </div>
     </div>
+</div>
 {% endblock %}

@@ -7,7 +7,7 @@ from .models import Livro, Emprestimo, Leitor
 from .forms import LivroForm, EmprestimoForm, LeitorForm
 from django.utils import timezone # Importe o timezone
 
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView
 from django.contrib.messages.views import SuccessMessageMixin 
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -18,6 +18,8 @@ from django.http import JsonResponse
 from django.http import HttpResponseRedirect
 from django.db.models import Q
 
+
+        
 # --------------- Registrar novo bibliotecario ------------
 
 def home(request):
@@ -38,7 +40,6 @@ class RegistrarBibliotecario(CreateView):
 
 # --------------- View para listar todos os livros ------------
 
-@login_required
 def lista_livros(request):
     # A lógica de busca e filtro continua exatamente a mesma
     queryset = Livro.objects.all().order_by('titulo')
@@ -334,3 +335,9 @@ def search_leitores(request):
         for leitor in leitores
     ]
     return JsonResponse(results, safe=False)
+
+class ContatoView(TemplateView):
+    template_name = 'acervo/contato.html'
+    
+class SobreNosView(TemplateView):
+    template_name = 'acervo/sobre_nos.html'

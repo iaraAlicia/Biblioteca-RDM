@@ -1,0 +1,160 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteca Virtual - Escola Rosa Doralina Mendes</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <style>
+        /* Layout Principal */
+        body, html {
+            height: 100%;
+            margin: 0;
+            overflow: hidden; /* Garante que não haverá scroll */
+        }
+        .navbar .container-fluid, .hero-container {
+            width: 100%;
+            padding-right: 9%;
+            padding-left: 9%;
+            margin-right: auto;
+            margin-left: auto;
+        }
+
+        /* 1. NAVBAR E FOOTER AGORA SÃO FLUTUANTES */
+        .navbar-overlay, .footer-overlay {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            z-index: 10; /* Garante que fiquem acima da imagem e do overlay */
+        }
+        .navbar-overlay {
+            top: 0;
+        }
+        
+        .footer-overlay {
+            bottom: 0;
+        }
+        .page-container {
+            width: 100%;
+            padding-right: 9%;
+            padding-left: 9%;
+            margin-right: auto;
+            margin-left: auto;
+        }
+        .navbar-brand small {
+            font-size: 0.7rem; /* Diminui o tamanho do subtítulo */
+        }
+
+        /* Estilos do Hero Section (a imagem de fundo) */
+        .hero-section {
+            position: relative; height: 100vh;
+            {% block page_specific_css %}
+            /* Este é o CSS padrão, usado pela home page */
+            background-image: url("{% static 'images/Background6.png' %}");
+            {% endblock %}
+            background-size: cover; background-position: center; color: white;
+            display: flex; align-items: center; justify-content: flex-start;
+        }
+        .hero-overlay {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1;
+        }
+        .hero-content {
+            position: relative; z-index: 2; text-align: left; max-width: 800px;
+        }
+        .hero-content .lead {
+            font-size: 1.15rem; margin-top: 1rem; margin-bottom: 2.5rem; max-width: 500px; color: #FFFFFF;
+        }
+
+        /* ... (outros estilos do hero content) ... */
+
+        .btn-custom-primary { background-color: #2c5b96; border-color: #2c5b96; color: white; font-weight: 500; padding: 12px 35px; margin: 0 10px; border-radius: 50px; }
+        .btn-custom-primary:hover { background-color: #244a7a; border-color: #244a7a; color: white; }
+        .btn-custom-secondary { background-color: #63c7b2; border-color: #63c7b2; color: white; font-weight: 500; padding: 12px 35px; margin: 0 10px; border-radius: 50px; }
+        .btn-custom-secondary:hover { background-color: #55b8a3; border-color: #55b8a3; color: white; }
+        
+        /* Estilos do Widget de Acessibilidade (continua igual) */
+        .accessibility-widget {
+            position: fixed; right: 20px; top: 50%; transform: translateY(-50%); z-index: 1050; display: flex; flex-direction: column; gap: 8px;
+        }
+        .accessibility-widget .btn { background-color: #2c5b96; color: white; border-radius: 50%; width: 50px; height: 50px; font-size: 1.2rem; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        .accessibility-widget .btn:hover { background-color: #244a7a; }
+
+
+        body.light-theme .navbar-brand,
+        body.light-theme .nav-link {
+            color: #2c5b96 !important; /* Azul escuro do seu design */
+        }
+
+        /* Altera a cor do ícone do menu "hambúrguer" em telas menores */
+        body.light-theme .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%2844, 91, 150, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        body.light-theme .footer-overlay {
+            color: #2c5b96 !important;
+        }
+
+        body.light-theme .footer-overlay .btn-outline-light {
+            border-color: #2c5b96;
+            color: #2c5b96;
+        }
+        body.light-theme .footer-overlay .btn-outline-light:hover {
+            background-color: #2c5b96;
+            color: white;
+        }
+
+    </style>
+</head>
+
+<body class="{% block body_class %}{% endblock %}">
+    <div class="accessibility-widget">
+        <button id="btn-increase-font" class="btn" title="Aumentar fonte">A+</button>
+        <button id="btn-decrease-font" class="btn" title="Diminuir fonte">A-</button>
+        <button id="btn-high-contrast" class="btn" title="Alto contraste"><i class="bi bi-circle-half"></i></button>
+    </div>
+
+    <nav class="navbar navbar-expand-lg navbar-dark position-absolute top-0 start-0 w-100" style="z-index: 10;">
+            <div class="container-fluid">
+                <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
+                    <img src="{% static 'images/logo.png' %}" alt="Logo da Biblioteca" height="40" class="d-inline-block align-text-top me-2">
+                    <span style="font-weight:500;">Biblioteca Rosa Doralina</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavContent">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNavContent">
+                    <ul class="navbar-nav ms-auto">
+                        
+                        <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Inicio</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'sobre_nos' %}">Sobre Nós</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'contato' %}">Contato</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    {% block content %}{% endblock %}
+
+    <footer class="text-white py-3 footer-overlay bg-custom-dark-blue">
+            <div class="container-fluid d-flex justify-content-between align-items-center page-container">
+                <p class="mb-0">&copy; {% now "Y" %} - Escola Rosa Doralina Mendes <br> Conceição das Crioulas - Salgueiro/PE</p>
+
+                <div class="footer-socials">
+                    <a href="#" class="btn btn-outline-light rounded-circle mx-1"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="btn btn-outline-light rounded-circle mx-1"><i class="bi bi-instagram"></i></a>
+                    <a href="#" class="btn btn-outline-light rounded-circle mx-1"><i class="bi bi-twitter-x"></i></a>
+                    <a href="#" class="btn btn-outline-light rounded-circle mx-1"><i class="bi bi-search"></i></a>
+                </div>
+            </div>
+        </footer>
+
+    <script>
+        // ... (seu script de acessibilidade) ...
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
