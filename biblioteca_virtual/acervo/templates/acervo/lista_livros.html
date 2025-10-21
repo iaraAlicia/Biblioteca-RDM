@@ -37,8 +37,9 @@
                 <tr>
                     <th>Título</th>
                     <th>Autor</th>
-                    <th>Status</th>
+                    <th>Cópias Disponíveis</th> 
                     <th class="text-end">Ações</th>
+                  
                 </tr>
             </thead>
             <tbody>
@@ -47,11 +48,9 @@
                     <td><a href="{% url 'detalhes_livro' livro.pk %}" class="text-decoration-none">{{ livro.titulo }}</a></td>
                     <td>{{ livro.autor }}</td>
                     <td>
-                        {% if livro.disponivel %}
-                            <span class="status-pill status-disponivel">Disponível</span>
-                        {% else %}
-                            <span class="status-pill status-emprestado">Emprestado</span>
-                        {% endif %}
+                        <span class="badge {% if livro.copias_disponiveis > 0 %}bg-success{% else %}bg-danger{% endif %}">
+                            {{ livro.copias_disponiveis }} / {{ livro.numero_copias }}
+                        </span>
                     </td>
                     <td class="text-end">
                         <a href="{% url 'editar_livro' livro.pk %}" class="btn btn-warning btn-action">

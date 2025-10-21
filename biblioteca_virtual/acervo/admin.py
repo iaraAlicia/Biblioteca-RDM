@@ -5,9 +5,13 @@ from .models import Livro, Emprestimo
 
 @admin.register(Livro)
 class LivroAdmin(admin.ModelAdmin):
-    list_display = ('titulo', 'autor', 'disponivel')
-    list_filter = ('disponivel', 'autor')
+    # CORREÇÃO: Substitua 'disponivel' pelos novos campos
+    list_display = ('titulo', 'autor', 'numero_copias', 'copias_disponiveis') 
+    # CORREÇÃO: Remova 'disponivel' do filtro (pode adicionar 'genero' ou outro campo se quiser)
+    list_filter = ('genero', 'autor') 
     search_fields = ('titulo', 'autor', 'isbn')
+    # Adiciona 'copias_disponiveis' como campo de apenas leitura
+    readonly_fields = ('copias_disponiveis',)
 
 @admin.register(Emprestimo)
 class EmprestimoAdmin(admin.ModelAdmin):

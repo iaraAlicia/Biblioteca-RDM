@@ -1,0 +1,83 @@
+{% extends 'acervo/base.html' %}
+
+{% block content %}
+<h1 class="h2 mb-4">Dashboard</h1>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title text-muted">Total de Livros</h5>
+                <p class="card-text display-4 fw-bold">{{ total_livros }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title text-success">Livros Disponíveis</h5>
+                <p class="card-text display-4 fw-bold">{{ livros_disponiveis }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title text-warning">Livros Emprestados</h5>
+                <p class="card-text display-4 fw-bold">{{ livros_emprestados }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm {% if emprestimos_atrasados > 0 %}border-danger{% endif %}">
+            <div class="card-body">
+                <h5 class="card-title text-danger">Empréstimos Atrasados</h5>
+                <p class="card-text display-4 fw-bold">{{ emprestimos_atrasados }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mb-4">
+    <h3 class="h4 mb-3">Ações Rápidas</h3>
+    <a href="{% url 'adicionar_livro' %}" class="btn btn-primary me-2"><i class="bi bi-book-half me-1"></i> Adicionar Livro</a>
+    <a href="{% url 'adicionar_leitor' %}" class="btn btn-info me-2 text-white"><i class="bi bi-person-plus-fill me-1"></i> Adicionar Leitor</a>
+    <a href="{% url 'adicionar_emprestimo' %}" class="btn btn-success"><i class="bi bi-arrow-right-square me-1"></i> Registrar Empréstimo</a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h3 class="h5 mb-0"><i class="bi bi-clock-history me-2"></i>Últimos Empréstimos Registrados</h3>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Livro</th>
+                    <th>Leitor</th>
+                    <th>Data Empréstimo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for emprestimo in ultimos_emprestimos %}
+                <tr>
+                    <td>{{ emprestimo.livro.titulo }}</td>
+                    <td>{{ emprestimo.leitor.nome }}</td>
+                    <td>{{ emprestimo.data_emprestimo|date:"d/m/Y" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="text-center py-4">Nenhuma atividade recente.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if ultimos_emprestimos %}
+        <div class="card-footer text-center">
+            <a href="{% url 'lista_emprestimos' %}" class="btn btn-outline-secondary btn-sm">Ver todos os empréstimos</a>
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

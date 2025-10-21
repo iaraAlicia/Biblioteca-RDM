@@ -11,6 +11,9 @@ urlpatterns = [
     # Nossa view personalizada para registrar um novo bibliotecário
     path('registrar/', views.RegistrarBibliotecario.as_view(), name='registrar'),
     
+    # URL para dashboard
+    path('dashboard/', views.dashboard, name='dashboard'),
+    
     # URLs para Livros
     path('livros/', views.lista_livros, name='lista_livros'),
     path('livros/novo/', views.adicionar_livro, name='adicionar_livro'),
@@ -38,6 +41,9 @@ urlpatterns = [
     
     path('sobre/', views.SobreNosView.as_view(), name='sobre_nos'),
 
-    # ADICIONE A NOVA URL DE CONTATO AQUI
+    # URL DE CONTATO 
     path('contato/', views.ContatoView.as_view(), name='contato'),
+    
+    # URL PARA O PDF
+    path('emprestimos/gerar-pdf/', views.gerar_relatorio_emprestimos_pdf, name='gerar_relatorio_emprestimos_pdf'),
 ]

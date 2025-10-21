@@ -19,14 +19,33 @@ class CustomAuthenticationForm(AuthenticationForm):
 class LivroForm(forms.ModelForm):
     class Meta:
         model = Livro
-        fields = ['titulo', 'autor', 'editora', 'ano_publicacao', 'isbn']
+        # Inclua os novos campos, exceto 'copias_disponiveis'
+        fields = ['titulo', 'autor', 'editora', 'ano_publicacao', 'isbn', 'genero', 'descricao', 'numero_copias']
         widgets = {
             'titulo': forms.TextInput(attrs={'class': 'form-control'}),
             'autor': forms.TextInput(attrs={'class': 'form-control'}),
             'editora': forms.TextInput(attrs={'class': 'form-control'}),
-            'ano_publicacao': forms.TextInput(attrs={'class': 'form-control'}),
+            'ano_publicacao': forms.NumberInput(attrs={'class': 'form-control'}),
             'isbn': forms.TextInput(attrs={'class': 'form-control'}),
+            'genero': forms.TextInput(attrs={'class': 'form-control'}),
+            'descricao': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'numero_copias': forms.NumberInput(attrs={'class': 'form-control'}),
         }
+
+    # Lógica para garantir que 'copias_disponiveis' acompanhe 'numero_copias'
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if not instance.pk: # Se for um livro novo
+            instance.copias_disponiveis = instance.numero_copias
+        else: # Se estiver editando
+            livro_antigo = Livro.objects.get(pk=instance.pk)
+            # Ajusta cópias disponíveis pela diferença
+            diferenca = instance.numero_copias - livro_antigo.numero_copias
+            instance.copias_disponiveis = max(0, livro_antigo.copias_disponiveis + diferenca) # Garante que não fique negativo
+            
+        if commit:
+            instance.save()
+        return instance
 
 class EmprestimoForm(forms.ModelForm):
     class Meta:

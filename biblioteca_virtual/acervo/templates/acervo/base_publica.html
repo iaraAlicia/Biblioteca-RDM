@@ -34,7 +34,20 @@
         .navbar-overlay {
             top: 0;
         }
-        
+        .navbar .nav-link {
+            color: white; /* Cor padrão branca */
+            font-size: 1.1rem; /* Aumenta o tamanho da fonte */
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: opacity 0.2s ease-in-out;
+        }
+        .navbar .nav-link:hover {
+            opacity: 0.8;
+        }
+        .navbar-brand small {
+            font-size: 0.7rem;
+        }
+
         .footer-overlay {
             bottom: 0;
         }
@@ -107,17 +120,96 @@
             color: white;
         }
 
+  /* Estilo para o fundo desfocado (continua igual) */
+.modal-backdrop.show {
+    backdrop-filter: blur(4px) saturate(80%);
+    -webkit-backdrop-filter: blur(4px) saturate(80%);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Estilo para posicionar o modal à esquerda (continua igual) */
+.modal-left .modal-dialog {
+    margin: 0;
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    max-width: 450px;
+}
+
+/* Estilo para o conteúdo do modal (AQUI ESTÃO AS MELHORIAS) */
+.modal-left .modal-content {
+    height: 100%;
+    border: none;
+    background-color: #0290c3;
+    color: white;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.3); /* Adiciona uma sombra sutil */
+
+    /* A MÁGICA DA BORDA REDONDA ACONTECE AQUI */
+    border-radius: 0 1.5rem 1.5rem 0; /* (top-left, top-right, bottom-right, bottom-left) */
+}
+
+    /* --- MELHORIAS NA ESTILIZAÇÃO DAS FONTES --- */
+
+    /* Ajusta o espaçamento interno geral */
+    .modal-left .modal-header,
+    .modal-left .modal-body,
+    .modal-left .modal-footer {
+        padding: 2rem;
+    }
+
+    /* Deixa o título maior e mais imponente */
+    .modal-left .modal-title {
+        font-weight: 700;
+        font-size: 1.6rem;
+    }
+
+    /* Melhora a legibilidade do texto principal */
+    .modal-left .modal-body p {
+        font-size: 1.05rem;
+        line-height: 1.6; /* Mais espaço entre as linhas */
+        opacity: 0.9; /* Deixa o branco um pouco mais suave */
+    }
+
+    /* Deixa o subtítulo (Horário) com mais destaque */
+    .modal-left .modal-body h5 {
+        font-weight: 700;
+        opacity: 1;
+    }
+
+    /* Estiliza a linha separadora */
+    .modal-left hr {
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    @media (max-width: 991.98px) {
+        .navbar-collapse {
+            /* Dá um fundo sólido ao menu aberto, usando nossa cor customizada */
+            background-color: #2c5b96; 
+            /* Adiciona um preenchimento para os links não colarem nas bordas */
+            padding: 1rem;
+            /* Arredonda os cantos inferiores */
+            border-radius: 0.5rem;
+            /* Adiciona uma pequena sombra para dar destaque */
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+
+        /* Garante que os links dentro do menu aberto fiquem centralizados */
+        .navbar-nav {
+            align-items: center;
+        }
+    }
     </style>
 </head>
 
 <body class="{% block body_class %}{% endblock %}">
-    <div class="accessibility-widget">
+    <div class="accessibility-widget d-none d-md-flex">
         <button id="btn-increase-font" class="btn" title="Aumentar fonte">A+</button>
         <button id="btn-decrease-font" class="btn" title="Diminuir fonte">A-</button>
         <button id="btn-high-contrast" class="btn" title="Alto contraste"><i class="bi bi-circle-half"></i></button>
     </div>
 
-    <nav class="navbar navbar-expand-lg navbar-dark position-absolute top-0 start-0 w-100" style="z-index: 10;">
+    <nav class="navbar navbar-expand-lg navbar-dark position-absolute top-0 start-0 w-100" style="z-index: 1051;">
             <div class="container-fluid">
                 <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
                     <img src="{% static 'images/logo.png' %}" alt="Logo da Biblioteca" height="40" class="d-inline-block align-text-top me-2">
@@ -140,10 +232,10 @@
     {% block content %}{% endblock %}
 
     <footer class="text-white py-3 footer-overlay bg-custom-dark-blue">
-            <div class="container-fluid d-flex justify-content-between align-items-center page-container">
+            <div class="container-fluid d-flex justify-content-center justify-content-md-between align-items-center page-container">
                 <p class="mb-0">&copy; {% now "Y" %} - Escola Rosa Doralina Mendes <br> Conceição das Crioulas - Salgueiro/PE</p>
 
-                <div class="footer-socials">
+                <div class="footer-socials d-none d-md-flex">
                     <a href="#" class="btn btn-outline-light rounded-circle mx-1"><i class="bi bi-facebook"></i></a>
                     <a href="#" class="btn btn-outline-light rounded-circle mx-1"><i class="bi bi-instagram"></i></a>
                     <a href="#" class="btn btn-outline-light rounded-circle mx-1"><i class="bi bi-twitter-x"></i></a>
@@ -153,8 +245,25 @@
         </footer>
 
     <script>
-        // ... (seu script de acessibilidade) ...
-    </script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const htmlEl = document.documentElement;
+            const bodyEl = document.body;
+
+            document.getElementById('btn-increase-font').addEventListener('click', function() {
+                let currentSize = parseFloat(window.getComputedStyle(htmlEl).fontSize);
+                if (currentSize < 18) htmlEl.style.fontSize = (currentSize + 1) + 'px';
+            });
+
+            document.getElementById('btn-decrease-font').addEventListener('click', function() {
+                let currentSize = parseFloat(window.getComputedStyle(htmlEl).fontSize);
+                if (currentSize > 14) htmlEl.style.fontSize = (currentSize - 1) + 'px';
+            });
+
+            document.getElementById('btn-high-contrast').addEventListener('click', function() {
+                bodyEl.classList.toggle('high-contrast');
+            });
+        });
+        </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
