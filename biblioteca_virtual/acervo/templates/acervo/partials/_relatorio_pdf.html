@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório de Empréstimos</title>
+    <style>
+        body { font-family: sans-serif; }
+        h1 { text-align: center; color: #2c5b96; margin-bottom: 20px;} /* Added margin */
+        table { width: 100%; border-collapse: collapse; font-size: 11px; } /* Slightly smaller font */
+        th, td { border: 1px solid #ccc; padding: 6px; text-align: left; } /* Reduced padding */
+        th { background-color: #f2f2f2; }
+        /* Style for status (optional, but good for clarity) */
+        .status-atrasado { color: #dc3545; font-weight: bold; }
+        .status-devolvido { color: #198754; }
+        /* 1. ESTILO PARA O NOVO RODAPÉ */
+        #footer-content {
+            text-align: right;
+            font-size: 10px;
+            color: #666;
+        }
+
+        /* 2. REGRAS @page PARA POSICIONAR O RODAPÉ */
+        @page {
+            size: A4; /* Define o tamanho da página */
+            margin: 1.5cm; /* Define as margens */
+
+            @bottom-right { /* Posiciona o conteúdo no canto inferior direito */
+                content: element(footer); /* Pega o conteúdo do elemento com ID 'footer' */
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Relatório de Empréstimos</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Livro</th>
+                <th>Leitor</th>
+                <th>Matrícula</th>
+                <th>Data do Empréstimo</th>
+                <th>Devolução Prevista</th>
+                <th>Status</th> </tr>
+        </thead>
+        <tbody>
+            {% for emprestimo in emprestimos %}
+            <tr>
+                <td>{{ emprestimo.livro.titulo }}</td>
+                <td>{{ emprestimo.leitor.nome }}</td>
+                <td>{{ emprestimo.leitor.matricula }}</td>
+                <td>{{ emprestimo.data_emprestimo|date:"d/m/Y" }}</td>
+                <td>{{ emprestimo.data_devolucao_prevista|date:"d/m/Y" }}</td>
+                <td>
+                    {% if emprestimo.data_devolucao_real %}
+                        <span class="status-devolvido">Devolvido</span>
+                    {% elif emprestimo.esta_atrasado %}
+                        <span class="status-atrasado">Atrasado</span>
+                    {% else %}
+                        Emprestado
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align: center;">Nenhum empréstimo encontrado.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div id="footer" style="position: running(footer);">
+        <div id="footer-content">
+            Relatório gerado em: {% now "d/m/Y H:i" %} <br>
+            Escola Rosa Doralina Mendes
+        </div>
+    </div>
+</body>
+</html>

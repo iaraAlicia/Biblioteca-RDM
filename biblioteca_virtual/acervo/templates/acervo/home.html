@@ -1,0 +1,61 @@
+{% extends 'acervo/base_publica.html' %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="page-container">
+        <div class="hero-content slide-in-left-element">
+            <h1 class="display-5" style="color:#203e63; font-weight:600;"><i class="bi bi-book-open"></i>Bem-vindo(a)<br>à Biblioteca Virtual da<small style="color:white; font-weight:300;">  <br> Escola Rosa Doralina<br> </small> Mendes</h1>
+            <p class="lead">
+                Um espaço digital para gerenciar o acervo de nossa escola, incentivar a leitura e a preservar a história de Conceição das Crioulas.
+            </p>
+            <div>
+                <a href="#" class="btn btn-custom-primary" data-bs-toggle="modal" data-bs-target="#acervoModal">Acessar Acervo</a>
+                <a href="#" class="btn btn-custom-secondary" data-bs-toggle="modal" data-bs-target="#reservaModal">Reservar Livro</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade modal-left" id="acervoModal" tabindex="-1" aria-labelledby="acervoModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <h1 class="modal-title fs-4" id="acervoModalLabel"><i class="bi bi-building me-2"></i>Acesso ao Acervo Físico</h1>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Olá! O acervo de livros da Escola Rosa Doralina Mendes está disponível para empréstimo e consulta de forma presencial.</p>
+        <p>Visite-nos durante o nosso horário de funcionamento para explorar nossa coleção, pegar um livro emprestado ou simplesmente encontrar um lugar tranquilo para ler.</p>
+        <hr class="border-light">
+        <h5 class="fw-bold"><i class="bi bi-clock-fill me-2"></i>Horário de Funcionamento</h5>
+        <p><strong>Segunda a Sexta:</strong> 08:00h - 17:00h</p>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Entendido</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade modal-left" id="reservaModal" tabindex="-1" aria-labelledby="reservaModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <h1 class="modal-title fs-4" id="reservaModalLabel"><i class="bi bi-bookmark-star-fill me-2"></i>Sistema de Reservas</h1>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Nosso sistema de reservas online está em desenvolvimento e será lançado em breve!</p>
+        <p>Com ele, você poderá garantir que o livro desejado esteja esperando por você quando visitar a biblioteca.</p>
+        <p>Enquanto isso, todas as reservas podem ser feitas presencialmente com o bibliotecário. Agradecemos a sua compreensão!</p>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Entendido</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

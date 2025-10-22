@@ -1,35 +1,67 @@
 {% extends 'acervo/base.html' %}
 
 {% block content %}
-    <h1>Acervo de Livros</h1>
-    <a href="{% url 'adicionar_livro' %}" class="btn">Adicionar Novo Livro</a>
-    <br><br>
-    <table>
-        <thead>
-            <tr>
-                <th>Título</th>
-                <th>Autor</th>
-                <th>Status</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for livro in livros %}
-            <tr>
-                <td>{{ livro.titulo }}</td>
-                <td>{{ livro.autor }}</td>
-                <td>{% if livro.disponivel %}Disponível{% else %}Emprestado{% endif %}</td>
-                <td>
-                    <a href="{% url 'editar_livro' livro.pk %}">Editar</a>
-                    &nbsp;|&nbsp;
-                    <a href="{% url 'excluir_livro' livro.pk %}" style="color: red;">Excluir</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="4">Nenhum livro cadastrado.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2">Acervo de Livros</h1>
+        <a href="{% url 'adicionar_livro' %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Adicionar Novo Livro
+        </a>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="search-container flex-grow-1 me-3">
+            <form method="get" action="{% url 'lista_livros' %}">
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" name="q" value="{{ request.GET.q }}" class="form-control" placeholder="Buscar por título ou autor...">
+            </form>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Autor</th>
+                    <th>Cópias Disponíveis</th> 
+                    <th class="text-end">Ações</th>
+                  
+                </tr>
+            </thead>
+            <tbody>
+                {% for livro in page_obj %}
+                <tr>
+                    <td><a href="{% url 'detalhes_livro' livro.pk %}" class="text-decoration-none">{{ livro.titulo }}</a></td>
+                    <td>{{ livro.autor }}</td>
+                    <td>
+                        <span class="badge {% if livro.copias_disponiveis > 0 %}bg-success{% else %}bg-danger{% endif %}">
+                            {{ livro.copias_disponiveis }} / {{ livro.numero_copias }}
+                        </span>
+                    </td>
+                    <td class="text-end">
+                        <a href="{% url 'editar_livro' livro.pk %}" class="btn btn-warning btn-action">
+                            <i class="bi bi-pencil-fill"></i> Editar
+                        </a>
+                        <a href="{% url 'excluir_livro' livro.pk %}" class="btn btn-danger btn-action">
+                            <i class="bi bi-trash-fill"></i> Excluir
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center py-5">
+                        {% if request.GET.q or request.GET.status %}
+                            Nenhum livro encontrado com os filtros aplicados.
+                        {% else %}
+                            Nenhum livro cadastrado.
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include 'acervo/partials/_pagination.html' %}
+
 {% endblock %}

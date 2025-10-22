@@ -1,50 +1,120 @@
 {% extends 'acervo/base.html' %}
 
 {% block content %}
-    <h1>Histórico de Empréstimos</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2">Histórico de Empréstimos</h1>
+        <a href="{% url 'adicionar_emprestimo' %}" class="btn btn-primary">
+            <i class="bi bi-arrow-right-square"></i> Registrar Novo Empréstimo
+        </a>
+    </div>
 
-    {% if messages %}
-        <ul class="messages">
-            {% for message in messages %}
-                <li style="color: green;">{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="search-container flex-grow-1 me-3">
+            <form method="get" action="{% url 'lista_emprestimos' %}">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-lg-3">
+                                <label for="q" class="form-label">Buscar por Texto</label>
+                                <input type="text" name="q" id="q" value="{{ filtros_aplicados.q }}" class="form-control" placeholder="Livro, leitor ou matrícula...">
+                            </div>
+                            <div class="col-lg-2">
+                                <label for="data_inicio" class="form-label">De:</label>
+                                <input type="date" name="data_inicio" id="data_inicio" value="{{ filtros_aplicados.data_inicio }}" class="form-control">
+                            </div>
+                            <div class="col-lg-2">
+                                <label for="data_fim" class="form-label">Até:</label>
+                                <input type="date" name="data_fim" id="data_fim" value="{{ filtros_aplicados.data_fim }}" class="form-control">
+                            </div>
+                            <div class="col-lg-2">
+                                <label for="status" class="form-label">Status</label>
+                                <select name="status" id="status" class="form-select">
+                                    <option value="">Todos</option>
+                                    <option value="pendente" {% if filtros_aplicados.status == 'pendente' %}selected{% endif %}>Pendentes</option>
+                                    <option value="devolvido" {% if filtros_aplicados.status == 'devolvido' %}selected{% endif %}>Devolvidos</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-3 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary flex-grow-1">
+                                    <i class="bi bi-search"></i> Filtrar
+                                </button>
+                                <a href="{% url 'gerar_relatorio_emprestimos_pdf' %}?{{ request.GET.urlencode }}" class="btn btn-success" target="_blank">
+                                    <i class="bi bi-file-earmark-pdf-fill"></i> PDF
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="d-flex align-items-center">
+            <a href="{% url 'lista_emprestimos' %}" 
+               class="btn rounded-pill me-2 {% if not request.GET.status %}btn-secondary{% else %}btn-outline-secondary{% endif %}">
+               Todos
+            </a>
+            <a href="{% url 'lista_emprestimos' %}?status=pendente" 
+               class="btn rounded-pill me-2 {% if request.GET.status == 'pendente' %}btn-warning{% else %}btn-outline-warning{% endif %}">
+               Pendentes
+            </a>
+            <a href="{% url 'lista_emprestimos' %}?status=devolvido" 
+               class="btn rounded-pill {% if request.GET.status == 'devolvido' %}btn-success{% else %}btn-outline-success{% endif %}">
+               Devolvidos
+            </a>
+        </div>
+    </div>
 
-    <a href="{% url 'adicionar_emprestimo' %}" class="btn">Registrar Novo Empréstimo</a>
-    <br><br>
-    <table>
-        <thead>
-            <tr>
-                <th>Livro</th>
-                <th>Leitor</th>
-                <th>Data do Empréstimo</th>
-                <th>Devolução Prevista</th>
-                <th>Status</th> </tr>
-        </thead>
-        <tbody>
-            {% for emprestimo in emprestimos %}
-            <tr>
-                <td>{{ emprestimo.livro.titulo }}</td>
-                <td>{{ emprestimo.leitor }}</td>
-                <td>{{ emprestimo.data_emprestimo|date:"d/m/Y" }}</td>
-                <td>{{ emprestimo.data_devolucao_prevista|date:"d/m/Y" }}</td>
-                <td>
-                    {% if emprestimo.data_devolucao_real %}
-                        Devolvido em {{ emprestimo.data_devolucao_real|date:"d/m/Y" }}
-                    {% else %}
-                        <form action="{% url 'devolver_livro' emprestimo.id %}" method="post" style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit">Devolver</button>
-                        </form>
-                    {% endif %}
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="5">Nenhum empréstimo registrado.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-card">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Livro</th>
+                    <th>Leitor</th>
+                    <th>Matrícula</th>
+                    <th>Status</th>
+                    <th class="text-end">Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for emprestimo in page_obj %}
+                <tr>
+                    <td>{{ emprestimo.livro.titulo }}</td>
+                    <td>{{ emprestimo.leitor.nome }}</td>
+                    <td>{{ emprestimo.leitor.matricula }}</td>
+                    <td>
+                        {% if emprestimo.data_devolucao_real %}
+                            <span class="status-pill status-devolvido">Devolvido</span>
+                        {% elif emprestimo.esta_atrasado %}
+                            <span class="status-pill status-atrasado">Atrasado</span>
+                        {% else %}
+                            <span class="status-pill status-emprestado">Emprestado</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        {% if not emprestimo.data_devolucao_real %}
+                            <form action="{% url 'devolver_livro' emprestimo.id %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-action">
+                                    <i class="bi bi-check-lg"></i> Devolver
+                                </button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-5">
+                         {% if request.GET.q or request.GET.status %}
+                            Nenhum empréstimo encontrado com os filtros aplicados.
+                         {% else %}
+                            Nenhum empréstimo registrado.
+                         {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include 'acervo/partials/_pagination.html' %}
+
 {% endblock %}

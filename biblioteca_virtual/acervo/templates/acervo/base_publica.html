@@ -1,0 +1,358 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteca Virtual - Escola Rosa Doralina Mendes</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <style>
+        /* Layout Principal */
+        body, html {
+            height: 100%;
+            margin: 0;
+            overflow: hidden; /* Garante que não haverá scroll */
+        }
+        .navbar .container-fluid, .hero-container {
+            width: 100%;
+            padding-right: 9%;
+            padding-left: 9%;
+            margin-right: auto;
+            margin-left: auto;
+        }
+
+        /* 1. NAVBAR E FOOTER AGORA SÃO FLUTUANTES */
+        .navbar-overlay, .footer-overlay {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            z-index: 10; /* Garante que fiquem acima da imagem e do overlay */
+        }
+        .navbar-overlay {
+            top: 0;
+        }
+        .navbar .nav-link {
+            color: white; /* Cor padrão branca */
+            font-size: 1.1rem; /* Aumenta o tamanho da fonte */
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: opacity 0.2s ease-in-out;
+        }
+        .navbar .nav-link:hover {
+            opacity: 0.8;
+        }
+        .navbar-brand small {
+            font-size: 0.7rem;
+        }
+
+        .footer-overlay {
+            bottom: 0;
+        }
+        .page-container {
+            width: 100%;
+            padding-right: 9%;
+            padding-left: 9%;
+            margin-right: auto;
+            margin-left: auto;
+        }
+        .navbar-brand small {
+            font-size: 0.7rem; /* Diminui o tamanho do subtítulo */
+        }
+
+        /* Estilos do Hero Section (a imagem de fundo) */
+        .hero-section {
+            position: relative; height: 100vh;
+            {% block page_specific_css %}
+            /* Este é o CSS padrão, usado pela home page */
+            background-image: url("{% static 'images/Background6.png' %}");
+            {% endblock %}
+            background-size: cover; background-position: center; color: white;
+            display: flex; align-items: center; justify-content: flex-start;
+        }
+        .hero-overlay {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1;
+        }
+        .hero-content {
+            position: relative; z-index: 2; text-align: left; max-width: 800px;
+        }
+        .hero-content .lead {
+            font-size: 1.15rem; margin-top: 1rem; margin-bottom: 2.5rem; max-width: 500px; color: #FFFFFF;
+        }
+
+        /* ... (outros estilos do hero content) ... */
+
+        .btn-custom-primary { background-color: #2c5b96; border-color: #2c5b96; color: white; font-weight: 500; padding: 12px 35px; margin: 0 10px; border-radius: 50px; }
+        .btn-custom-primary:hover { background-color: #244a7a; border-color: #244a7a; color: white; }
+        .btn-custom-secondary { background-color: #63c7b2; border-color: #63c7b2; color: white; font-weight: 500; padding: 12px 35px; margin: 0 10px; border-radius: 50px; }
+        .btn-custom-secondary:hover { background-color: #55b8a3; border-color: #55b8a3; color: white; }
+        
+        /* Estilos do Widget de Acessibilidade (continua igual) */
+        .accessibility-widget {
+            position: fixed; right: 20px; top: 50%; transform: translateY(-50%); z-index: 1050; display: flex; flex-direction: column; gap: 8px;
+        }
+        .accessibility-widget .btn { background-color: #2c5b96; color: white; border-radius: 50%; width: 50px; height: 50px; font-size: 1.2rem; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        .accessibility-widget .btn:hover { background-color: #244a7a; }
+
+
+        body.light-theme .navbar-brand,
+        body.light-theme .nav-link {
+            color: #2c5b96 !important; /* Azul escuro do seu design */
+        }
+
+        /* Altera a cor do ícone do menu "hambúrguer" em telas menores */
+        body.light-theme .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%2844, 91, 150, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        body.light-theme .footer-overlay {
+            color: #2c5b96 !important;
+        }
+
+        body.light-theme .footer-overlay .btn-outline-light {
+            border-color: #2c5b96;
+            color: #2c5b96;
+        }
+        body.light-theme .footer-overlay .btn-outline-light:hover {
+            background-color: #2c5b96;
+            color: white;
+        }
+
+  /* Estilo para o fundo desfocado (continua igual) */
+.modal-backdrop.show {
+    backdrop-filter: blur(4px) saturate(80%);
+    -webkit-backdrop-filter: blur(4px) saturate(80%);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Estilo para posicionar o modal à esquerda (continua igual) */
+.modal-left .modal-dialog {
+    margin: 0;
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    max-width: 450px;
+}
+
+/* Estilo para o conteúdo do modal (AQUI ESTÃO AS MELHORIAS) */
+.modal-left .modal-content {
+    height: 100%;
+    border: none;
+    background-color: #0290c3;
+    color: white;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.3); /* Adiciona uma sombra sutil */
+
+    /* A MÁGICA DA BORDA REDONDA ACONTECE AQUI */
+    border-radius: 0 1.5rem 1.5rem 0; /* (top-left, top-right, bottom-right, bottom-left) */
+}
+
+    /* --- MELHORIAS NA ESTILIZAÇÃO DAS FONTES --- */
+
+    /* Ajusta o espaçamento interno geral */
+    .modal-left .modal-header,
+    .modal-left .modal-body,
+    .modal-left .modal-footer {
+        padding: 2rem;
+    }
+
+    /* Deixa o título maior e mais imponente */
+    .modal-left .modal-title {
+        font-weight: 700;
+        font-size: 1.6rem;
+    }
+
+    /* Melhora a legibilidade do texto principal */
+    .modal-left .modal-body p {
+        font-size: 1.05rem;
+        line-height: 1.6; /* Mais espaço entre as linhas */
+        opacity: 0.9; /* Deixa o branco um pouco mais suave */
+    }
+
+    /* Deixa o subtítulo (Horário) com mais destaque */
+    .modal-left .modal-body h5 {
+        font-weight: 700;
+        opacity: 1;
+    }
+
+    /* Estiliza a linha separadora */
+    .modal-left hr {
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    @media (max-width: 991.98px) {
+        .navbar-collapse {
+            /* Dá um fundo sólido ao menu aberto, usando nossa cor customizada */
+            background-color: #2c5b96; 
+            /* Adiciona um preenchimento para os links não colarem nas bordas */
+            padding: 1rem;
+            /* Arredonda os cantos inferiores */
+            border-radius: 0.5rem;
+            /* Adiciona uma pequena sombra para dar destaque */
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+
+        /* Garante que os links dentro do menu aberto fiquem centralizados */
+        .navbar-nav {
+            align-items: center;
+        }
+    }
+    #loader-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #ffffff; /* Fundo branco */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999; /* Garante que fique sobre todo o conteúdo */
+        opacity: 1;
+        transition: opacity 0.5s ease-out; /* Efeito de fade-out */
+    }
+
+    #lottie-animation {
+        width: 150px; /* Ajuste o tamanho conforme necessário */
+        height: 150px;
+    }
+
+    /* Classe para esconder o loader */
+    #loader-wrapper.hidden {
+        opacity: 0;
+        pointer-events: none; /* Impede interação após desaparecer */
+    }
+/* 1. Animação de FADE-IN simples (para navbar e footer) */
+.fade-in-element {
+    opacity: 0;
+    transition: opacity 0.8s ease-out; /* Apenas opacidade */
+}
+.fade-in-element.visible {
+    opacity: 1;
+}
+
+/* 2. NOVA Animação de SLIDE-IN-LEFT (para o texto principal) */
+.slide-in-left-element {
+    opacity: 0;
+    transform: translateX(-30px); /* Começa 30 pixels à ESQUERDA */
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out; /* Anima opacidade E posição X */
+}
+.slide-in-left-element.visible {
+    opacity: 1;
+    transform: translateX(0); /* Volta para a posição original */
+}
+    </style>
+</head>
+
+<body class="{% block body_class %}{% endblock %}">
+    <div id="loader-wrapper">
+        <div id="lottie-animation"></div>
+    </div>
+    <div class="accessibility-widget d-none d-md-flex">
+        <button id="btn-increase-font" class="btn" title="Aumentar fonte">A+</button>
+        <button id="btn-decrease-font" class="btn" title="Diminuir fonte">A-</button>
+        <button id="btn-high-contrast" class="btn" title="Alto contraste"><i class="bi bi-circle-half"></i></button>
+    </div>
+
+    <nav class="navbar navbar-expand-lg navbar-dark position-absolute top-0 start-0 w-100 fade-in-element" style="z-index: 1051;">
+            <div class="container-fluid">
+                <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
+                    <img src="{% static 'images/logo.png' %}" alt="Logo da Biblioteca" height="40" class="d-inline-block align-text-top me-2">
+                    <span style="font-weight:500;">Biblioteca Rosa Doralina</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavContent">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNavContent">
+                    <ul class="navbar-nav ms-auto">
+                        
+                        <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Inicio</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'sobre_nos' %}">Sobre Nós</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'contato' %}">Contato</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+   
+        {% block content %}{% endblock %}
+
+    <footer class="text-white py-3 footer-overlay bg-custom-dark-blue fade-in-element">
+            <div class="container-fluid d-flex justify-content-center justify-content-md-between align-items-center page-container">
+                <p class="mb-0">&copy; {% now "Y" %} - Escola Rosa Doralina Mendes <br> Conceição das Crioulas - Salgueiro/PE</p>
+
+                <div class="footer-socials d-none d-md-flex">
+                    <a href="#" class="btn btn-outline-light rounded-circle mx-1"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="btn btn-outline-light rounded-circle mx-1"><i class="bi bi-instagram"></i></a>
+                    <a href="#" class="btn btn-outline-light rounded-circle mx-1"><i class="bi bi-twitter-x"></i></a>
+                    <a href="#" class="btn btn-outline-light rounded-circle mx-1"><i class="bi bi-search"></i></a>
+                </div>
+            </div>
+        </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.9.6/lottie.min.js"></script>
+
+    <script>
+const loaderWrapper = document.getElementById('loader-wrapper');
+        const elementsToFadeIn = document.querySelectorAll('.fade-in-element'); // Pega os elementos uma vez
+        const elementsToAnimate = document.querySelectorAll('.fade-in-element, .slide-in-left-element');
+
+        // Configura e carrega a animação Lottie
+        var animation = lottie.loadAnimation({
+          container: document.getElementById('lottie-animation'),
+          renderer: 'svg',
+          loop: true,
+          autoplay: true,
+          path: "{% static 'animations/hand-loading.json' %}" 
+        });
+
+        // Função para esconder o loader e mostrar o conteúdo
+        function hideLoaderAndShowContent() {
+            // Garante que a função só execute uma vez
+            if (!loaderWrapper.classList.contains('hidden')) { 
+                
+                // 1. Inicia o fade-out do loader
+                loaderWrapper.classList.add('hidden');
+
+                // 2. Espera a transição do loader (0.5s = 500ms) terminar
+                //    ANTES de começar a mostrar o conteúdo.
+                setTimeout(function() {
+                    elementsToAnimate.forEach(el => el.classList.add('visible'));
+
+                }, 500); // <-- Tempo da transição do LOADER (definido no CSS #loader-wrapper)
+            }
+        }
+
+        // Adiciona um listener para o evento 'load' da janela
+        window.addEventListener('load', function() {
+            // Adiciona um delay mínimo ANTES de chamar a função
+            setTimeout(hideLoaderAndShowContent, 900); // Garante que o loader fique visível por ~1s
+        });
+
+        // Segurança extra: esconde após X segundos
+        setTimeout(hideLoaderAndShowContent, 5000); // Esconde após 5 segundos no total
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const htmlEl = document.documentElement;
+            const bodyEl = document.body;
+
+            document.getElementById('btn-increase-font').addEventListener('click', function() {
+                let currentSize = parseFloat(window.getComputedStyle(htmlEl).fontSize);
+                if (currentSize < 18) htmlEl.style.fontSize = (currentSize + 1) + 'px';
+            });
+
+            document.getElementById('btn-decrease-font').addEventListener('click', function() {
+                let currentSize = parseFloat(window.getComputedStyle(htmlEl).fontSize);
+                if (currentSize > 14) htmlEl.style.fontSize = (currentSize - 1) + 'px';
+            });
+
+            document.getElementById('btn-high-contrast').addEventListener('click', function() {
+                bodyEl.classList.toggle('high-contrast');
+            });
+        });
+        </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

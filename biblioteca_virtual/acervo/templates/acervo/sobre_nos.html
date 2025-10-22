@@ -1,0 +1,42 @@
+{% extends 'acervo/base_publica.html' %}
+{% load static %}
+
+{% block body_class %}light-theme{% endblock %}
+{% block page_specific_css %}
+    /* 1. NOVA IMAGEM DE FUNDO */
+    background-image: url("{% static 'images/bg-SobreNos6.png' %}");
+
+    /* 2. REMOVENDO O OVERLAY AZUL ESCURO APENAS NESTA PÁGINA */
+    --hero-overlay-color: transparent;
+{% endblock %}
+
+
+{% block content %}
+<style>
+    /* 3. ESTILOS ESPECÍFICOS APENAS PARA ESTA PÁGINA (TEXTO AZUL) */
+    .sobre-nos-content h1,
+    .sobre-nos-content h1 i,
+    .sobre-nos-content p {
+        color: #2c5b96 !important; /* Azul escuro do seu design */
+    }
+    @media (max-width: 991.98px) {
+    .navbar-collapse {
+        background-color: #ffffffff;
+    }
+</style>
+
+<div class="hero-section">
+    <div class="hero-overlay" style="background-color: var(--hero-overlay-color, rgba(44, 91, 150, 0.8));"></div>
+    <div class="hero-container slide-in-left-element">
+        <div class="hero-content sobre-nos-content">
+            <h1 class="display-4"><i class="bi bi-bank2"></i> Sobre a<br>Escola Rosa Doralina Mendes</h1>
+            <p class="lead">
+                A Escola Rosa Doralina Mendes é um pilar da educação em Conceição das Crioulas, comprometida em oferecer um ensino de qualidade que valoriza nossa cultura e história.
+            </p>
+            <p class="lead">
+                Nossa biblioteca virtual é uma extensão desse compromisso, um espaço digital criado para incentivar o amor pela leitura, facilitar o acesso ao conhecimento e preservar as histórias que formam nossa comunidade.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

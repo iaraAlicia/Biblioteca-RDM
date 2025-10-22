@@ -4,7 +4,51 @@
     <h1>Registrar Novo Empréstimo</h1>
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn">Registrar Empréstimo</button>
+        {% for field in form %}
+            <div class="mb-3">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.errors %}
+                    <div class="text-danger">
+                        {{ field.errors }}
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Salvar</button>
     </form>
+{% endblock %}
+
+{% block javascript %}
+<script>
+$(document).ready(function() {
+    // Configuração para o campo de Leitor (ID: #id_leitor)
+    $('#id_leitor').select2({
+        placeholder: "Pesquise por nome ou matrícula...",
+        ajax: {
+            url: "{% url 'search_leitores' %}",
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return { term: params.term };
+            },
+            processResults: function (data) {
+                return { results: data };
+            }
+        }
+    });
+
+    // Configuração para o campo de Livro (ID: #id_livro)
+    $('#id_livro').select2({
+        placeholder: "Pesquise por título ou ISBN...",
+        ajax: {
+            url: "{% url 'search_livros' %}",
+            dataType: 'json',
+            delay: 250,
+            data: function (params) { return { term: params.term }; },
+            processResults: function (data) { return { results: data }; }
+        }
+    });
+});
+</script>
 {% endblock %}

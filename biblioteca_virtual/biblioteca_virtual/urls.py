@@ -19,7 +19,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include # Adicione 'include'
 
+from acervo import views as acervo_views
+
 urlpatterns = [
+    path('', acervo_views.home, name='home'),
     path('admin/', admin.site.urls),
     path('acervo/', include('acervo.urls')), # Adicione esta linha
 ]
