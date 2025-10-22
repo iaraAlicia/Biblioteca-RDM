@@ -199,17 +199,64 @@
             align-items: center;
         }
     }
+    #loader-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #ffffff; /* Fundo branco */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999; /* Garante que fique sobre todo o conteúdo */
+        opacity: 1;
+        transition: opacity 0.5s ease-out; /* Efeito de fade-out */
+    }
+
+    #lottie-animation {
+        width: 150px; /* Ajuste o tamanho conforme necessário */
+        height: 150px;
+    }
+
+    /* Classe para esconder o loader */
+    #loader-wrapper.hidden {
+        opacity: 0;
+        pointer-events: none; /* Impede interação após desaparecer */
+    }
+/* 1. Animação de FADE-IN simples (para navbar e footer) */
+.fade-in-element {
+    opacity: 0;
+    transition: opacity 0.8s ease-out; /* Apenas opacidade */
+}
+.fade-in-element.visible {
+    opacity: 1;
+}
+
+/* 2. NOVA Animação de SLIDE-IN-LEFT (para o texto principal) */
+.slide-in-left-element {
+    opacity: 0;
+    transform: translateX(-30px); /* Começa 30 pixels à ESQUERDA */
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out; /* Anima opacidade E posição X */
+}
+.slide-in-left-element.visible {
+    opacity: 1;
+    transform: translateX(0); /* Volta para a posição original */
+}
     </style>
 </head>
 
 <body class="{% block body_class %}{% endblock %}">
+    <div id="loader-wrapper">
+        <div id="lottie-animation"></div>
+    </div>
     <div class="accessibility-widget d-none d-md-flex">
         <button id="btn-increase-font" class="btn" title="Aumentar fonte">A+</button>
         <button id="btn-decrease-font" class="btn" title="Diminuir fonte">A-</button>
         <button id="btn-high-contrast" class="btn" title="Alto contraste"><i class="bi bi-circle-half"></i></button>
     </div>
 
-    <nav class="navbar navbar-expand-lg navbar-dark position-absolute top-0 start-0 w-100" style="z-index: 1051;">
+    <nav class="navbar navbar-expand-lg navbar-dark position-absolute top-0 start-0 w-100 fade-in-element" style="z-index: 1051;">
             <div class="container-fluid">
                 <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
                     <img src="{% static 'images/logo.png' %}" alt="Logo da Biblioteca" height="40" class="d-inline-block align-text-top me-2">
@@ -229,9 +276,10 @@
                 </div>
             </div>
         </nav>
-    {% block content %}{% endblock %}
+   
+        {% block content %}{% endblock %}
 
-    <footer class="text-white py-3 footer-overlay bg-custom-dark-blue">
+    <footer class="text-white py-3 footer-overlay bg-custom-dark-blue fade-in-element">
             <div class="container-fluid d-flex justify-content-center justify-content-md-between align-items-center page-container">
                 <p class="mb-0">&copy; {% now "Y" %} - Escola Rosa Doralina Mendes <br> Conceição das Crioulas - Salgueiro/PE</p>
 
@@ -244,7 +292,48 @@
             </div>
         </footer>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.9.6/lottie.min.js"></script>
+
     <script>
+const loaderWrapper = document.getElementById('loader-wrapper');
+        const elementsToFadeIn = document.querySelectorAll('.fade-in-element'); // Pega os elementos uma vez
+        const elementsToAnimate = document.querySelectorAll('.fade-in-element, .slide-in-left-element');
+
+        // Configura e carrega a animação Lottie
+        var animation = lottie.loadAnimation({
+          container: document.getElementById('lottie-animation'),
+          renderer: 'svg',
+          loop: true,
+          autoplay: true,
+          path: "{% static 'animations/hand-loading.json' %}" 
+        });
+
+        // Função para esconder o loader e mostrar o conteúdo
+        function hideLoaderAndShowContent() {
+            // Garante que a função só execute uma vez
+            if (!loaderWrapper.classList.contains('hidden')) { 
+                
+                // 1. Inicia o fade-out do loader
+                loaderWrapper.classList.add('hidden');
+
+                // 2. Espera a transição do loader (0.5s = 500ms) terminar
+                //    ANTES de começar a mostrar o conteúdo.
+                setTimeout(function() {
+                    elementsToAnimate.forEach(el => el.classList.add('visible'));
+
+                }, 500); // <-- Tempo da transição do LOADER (definido no CSS #loader-wrapper)
+            }
+        }
+
+        // Adiciona um listener para o evento 'load' da janela
+        window.addEventListener('load', function() {
+            // Adiciona um delay mínimo ANTES de chamar a função
+            setTimeout(hideLoaderAndShowContent, 900); // Garante que o loader fique visível por ~1s
+        });
+
+        // Segurança extra: esconde após X segundos
+        setTimeout(hideLoaderAndShowContent, 5000); // Esconde após 5 segundos no total
+        
         document.addEventListener('DOMContentLoaded', function() {
             const htmlEl = document.documentElement;
             const bodyEl = document.body;
