@@ -34,10 +34,13 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 ALLOWED_HOSTS = []
-# O Render adicionará o host automaticamente, mas podemos preparar:
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+
+# ADICIONE ESTA LINHA:
+ALLOWED_HOSTS.append('.onrender.com') # Permite qualquer subdomínio do Render
+
 # Para desenvolvimento local:
 if DEBUG:
     ALLOWED_HOSTS.append('127.0.0.1')
