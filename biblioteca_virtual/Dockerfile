@@ -28,6 +28,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copia o resto do código do seu projeto para dentro do container
 COPY . /app/
 
+# Garante que o script build.sh seja executável
+RUN chmod +x ./build.sh
+
 # Expõe a porta que o Gunicorn vai usar (o Render usa 10000 por padrão)
 EXPOSE 10000
 
