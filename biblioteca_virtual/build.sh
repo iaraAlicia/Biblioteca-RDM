@@ -4,4 +4,3 @@ set -o errexit
 
 # Comandos a serem executados durante o build
 python manage.py collectstatic --no-input
-python manage.py migrate
